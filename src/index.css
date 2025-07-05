@@ -1,11 +1,13 @@
 /* 
  * src/index.css
- * Global styles for Kairos Frontend with Tailwind CSS v4
+ * Global styles for Kairos Frontend with Tailwind CSS v3
  * Includes Tailwind directives and custom base styles
  */
 
-/* Tailwind CSS v4 directives */
-@import "tailwindcss";
+/* Tailwind CSS v3 directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Custom base styles */
 @layer base {
@@ -83,15 +85,15 @@
 /* Custom component styles */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
   }
   
   .btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800;
+    @apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
   }
   
   .btn-secondary {
-    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300;
+    @apply bg-secondary-100 text-secondary-900 hover:bg-secondary-200 active:bg-secondary-300;
   }
 
   .btn-outline {
@@ -123,7 +125,7 @@
   }
 
   .badge-primary {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-primary-100 text-primary-800;
   }
 
   .badge-secondary {

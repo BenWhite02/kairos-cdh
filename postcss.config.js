@@ -1,7 +1,7 @@
 /* 
  * postcss.config.js
- * PostCSS configuration for processing CSS with Tailwind
- * Includes Tailwind CSS and Autoprefixer plugins
+ * PostCSS configuration for Tailwind CSS v3
+ * Uses standard tailwindcss and autoprefixer plugins
  */
 export default {
   plugins: {
