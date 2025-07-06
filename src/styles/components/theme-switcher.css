@@ -1,0 +1,349 @@
+/* File: src/styles/components/theme-switcher.css */
+/* 🎨 Theme Switcher Component Styles */
+/* All styling kept in classes as per project requirements */
+
+/* =============================================================================
+   BASE THEME SWITCHER STYLES
+   ============================================================================= */
+
+.theme-switcher-icon {
+  @apply w-4 h-4 flex-shrink-0;
+}
+
+.theme-switcher-loading {
+  @apply absolute inset-0 bg-black bg-opacity-10 rounded flex items-center justify-center;
+}
+
+.theme-switcher-loading::after {
+  content: '';
+  @apply w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
+}
+
+/* =============================================================================
+   COMPACT VARIANT
+   ============================================================================= */
+
+.theme-switcher-compact {
+  @apply relative inline-flex items-center justify-center w-10 h-10;
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
+  @apply rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+  @apply text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.theme-switcher-compact:hover {
+  @apply -translate-y-0.5 scale-105;
+}
+
+/* =============================================================================
+   EXPANDED VARIANT
+   ============================================================================= */
+
+.theme-switcher-expanded {
+  @apply flex items-center gap-2 p-2 bg-white dark:bg-gray-800;
+  @apply border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm;
+}
+
+.theme-switcher-option {
+  @apply relative flex items-center gap-2 px-3 py-2 rounded-md;
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+  @apply hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.theme-switcher-option-active {
+  @apply bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100;
+  @apply ring-1 ring-blue-500 ring-inset;
+}
+
+.theme-switcher-option-label {
+  @apply font-medium;
+}
+
+.theme-switcher-create {
+  @apply border-l border-gray-200 dark:border-gray-700 ml-2 pl-4;
+  @apply text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300;
+}
+
+/* =============================================================================
+   DROPDOWN VARIANT
+   ============================================================================= */
+
+.theme-switcher-dropdown {
+  @apply relative inline-block;
+}
+
+.theme-switcher-trigger {
+  @apply inline-flex items-center justify-between gap-3 px-4 py-2;
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
+  @apply rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+  @apply text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  @apply min-w-[140px];
+}
+
+.theme-switcher-trigger-open {
+  @apply ring-2 ring-blue-500 ring-offset-2;
+}
+
+.theme-switcher-trigger-content {
+  @apply flex items-center gap-2;
+}
+
+.theme-switcher-trigger-label {
+  @apply text-sm font-medium truncate;
+}
+
+.theme-switcher-custom-indicator {
+  @apply w-3 h-3 text-yellow-500 animate-pulse;
+}
+
+.theme-switcher-chevron {
+  @apply w-4 h-4 transition-transform duration-200;
+}
+
+.theme-switcher-trigger-open .theme-switcher-chevron {
+  @apply rotate-180;
+}
+
+/* =============================================================================
+   DROPDOWN MENU
+   ============================================================================= */
+
+.theme-switcher-menu {
+  @apply absolute z-50 w-80 mt-2 bg-white dark:bg-gray-800;
+  @apply border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg;
+  @apply divide-y divide-gray-100 dark:divide-gray-700;
+  @apply animate-in fade-in-0 zoom-in-95 duration-200;
+}
+
+.theme-switcher-menu-top-left {
+  @apply origin-top-left left-0;
+}
+
+.theme-switcher-menu-top-right {
+  @apply origin-top-right right-0;
+}
+
+.theme-switcher-menu-bottom-left {
+  @apply origin-bottom-left left-0 bottom-full mb-2;
+}
+
+.theme-switcher-menu-bottom-right {
+  @apply origin-bottom-right right-0 bottom-full mb-2;
+}
+
+/* =============================================================================
+   MENU SECTIONS
+   ============================================================================= */
+
+.theme-switcher-section {
+  @apply p-2;
+}
+
+.theme-switcher-section-header {
+  @apply flex items-center justify-between px-2 py-1 mb-2;
+}
+
+.theme-switcher-section-title {
+  @apply text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide;
+}
+
+.theme-switcher-options {
+  @apply space-y-1;
+}
+
+/* =============================================================================
+   MENU OPTIONS
+   ============================================================================= */
+
+.theme-switcher-menu-option {
+  @apply relative w-full flex items-center gap-3 px-2 py-2 rounded-md;
+  @apply text-left text-gray-700 dark:text-gray-300;
+  @apply hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150;
+  @apply focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700;
+}
+
+.theme-switcher-menu-option-active {
+  @apply bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100;
+}
+
+.theme-switcher-menu-option-content {
+  @apply flex items-center gap-3 flex-1 min-w-0;
+}
+
+.theme-switcher-menu-option-info {
+  @apply flex-1 min-w-0;
+}
+
+.theme-switcher-menu-option-name {
+  @apply block text-sm font-medium truncate;
+}
+
+.theme-switcher-menu-option-description {
+  @apply block text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5;
+}
+
+.theme-switcher-check {
+  @apply w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0;
+}
+
+/* =============================================================================
+   THEME PREVIEW
+   ============================================================================= */
+
+.theme-switcher-preview {
+  @apply flex gap-1 flex-shrink-0;
+}
+
+.theme-switcher-preview-primary,
+.theme-switcher-preview-secondary,
+.theme-switcher-preview-accent {
+  @apply w-3 h-3 rounded-full border border-white/20;
+}
+
+/* =============================================================================
+   ACTIONS SECTION
+   ============================================================================= */
+
+.theme-switcher-actions {
+  @apply space-y-1;
+}
+
+.theme-switcher-action {
+  @apply w-full flex items-center gap-3 px-2 py-2 rounded-md;
+  @apply text-sm text-gray-700 dark:text-gray-300;
+  @apply hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150;
+  @apply focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700;
+}
+
+.theme-switcher-action-file {
+  @apply relative cursor-pointer;
+}
+
+.theme-switcher-action-icon {
+  @apply w-4 h-4 flex-shrink-0;
+}
+
+.theme-switcher-action-label {
+  @apply font-medium;
+}
+
+.theme-switcher-file-input {
+  @apply absolute inset-0 w-full h-full opacity-0 cursor-pointer;
+}
+
+/* =============================================================================
+   HOVER EFFECTS AND ANIMATIONS
+   ============================================================================= */
+
+.theme-switcher-option:hover .theme-switcher-preview {
+  @apply scale-110;
+}
+
+.theme-switcher-menu-option:hover .theme-switcher-preview {
+  @apply scale-110;
+}
+
+.theme-switcher-trigger:hover {
+  @apply shadow-md -translate-y-0.5;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+@media (max-width: 640px) {
+  .theme-switcher-menu {
+    @apply w-72;
+  }
+  
+  .theme-switcher-trigger {
+    @apply min-w-[120px];
+  }
+  
+  .theme-switcher-expanded {
+    @apply flex-wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-switcher-menu {
+    @apply w-64;
+  }
+  
+  .theme-switcher-trigger {
+    @apply min-w-[100px] text-xs;
+  }
+  
+  .theme-switcher-expanded {
+    @apply grid grid-cols-2 gap-1;
+  }
+  
+  .theme-switcher-option {
+    @apply px-2 py-1 text-xs;
+  }
+}
+
+/* =============================================================================
+   HIGH CONTRAST MODE
+   ============================================================================= */
+
+@media (prefers-contrast: high) {
+  .theme-switcher-trigger {
+    @apply border-2 border-gray-900 dark:border-gray-100;
+  }
+  
+  .theme-switcher-menu {
+    @apply border-2 border-gray-900 dark:border-gray-100;
+  }
+  
+  .theme-switcher-option-active {
+    @apply bg-blue-600 text-white ring-2 ring-blue-900;
+  }
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-switcher-trigger,
+  .theme-switcher-option,
+  .theme-switcher-menu-option,
+  .theme-switcher-action,
+  .theme-switcher-chevron,
+  .theme-switcher-preview,
+  .theme-switcher-preview-primary,
+  .theme-switcher-preview-secondary,
+  .theme-switcher-preview-accent {
+    @apply transition-none;
+  }
+  
+  .theme-switcher-menu {
+    @apply animate-none;
+  }
+  
+  .theme-switcher-loading::after {
+    @apply animate-none;
+  }
+  
+  .theme-switcher-custom-indicator {
+    @apply animate-none;
+  }
+}
+
+/* =============================================================================
+   PRINT STYLES
+   ============================================================================= */
+
+@media print {
+  .theme-switcher-compact,
+  .theme-switcher-expanded,
+  .theme-switcher-dropdown {
+    @apply hidden;
+  }
+}
