@@ -1,36 +1,10 @@
-/* 
- * tsconfig.node.json
- * TypeScript configuration for Node.js environment (Vite config, etc.)
- * Separate config for build tools and Node.js specific files
- */
 {
   "compilerOptions": {
     "composite": true,
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "noEmit": true,
-    "types": ["node", "vite/client"],
-    "target": "ES2022",
-    "lib": ["ES2022"],
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "vite.config.ts",
-    "vitest.config.ts",
-    "tailwind.config.js",
-    "postcss.config.js",
-    "eslint.config.js",
-    ".storybook/*.ts",
-    ".storybook/*.js"
-  ],
-  "exclude": [
-    "src",
-    "node_modules"
-  ]
+  "include": ["vite.config.ts"]
 }

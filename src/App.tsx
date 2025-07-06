@@ -1,99 +1,141 @@
-/* 
- * src/App.tsx
- * Main App component for Kairos Frontend with Rule Builder integration
- */
-import { useState } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
-import { HomeIcon, UserIcon, CogIcon, Zap } from 'lucide-react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-
-// Import pages
-import Home from './pages/Home'
-import About from './pages/About'
-import Settings from './pages/Settings'
-
-// Import Rule Builder
-import { RuleBuilder } from './components/RuleBuilder/RuleBuilder'
+import React from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center space-x-2">
-                <img src={viteLogo} className="h-8 w-8" alt="Vite logo" />
-                <img src={reactLogo} className="h-8 w-8 animate-spin" alt="React logo" />
-                <span className="text-xl font-bold text-gray-900">Kairos</span>
-              </Link>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="max-w-2xl mx-auto text-center">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="w-24 h-24 bg-gradient-kairos rounded-full flex items-center justify-center mx-auto mb-6 shadow-kairos animate-pulse-soft">
+            <span className="text-3xl text-white">⏰</span>
+          </div>
+          <h1 className="text-5xl font-bold text-gray-900 mb-4 animate-fade-in">
+            Kairos Frontend
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 animate-slide-up">
+            The Perfect Moment Delivery Interface
+          </p>
+        </div>
+        
+        {/* Status Card */}
+        <div className="card animate-scale-in mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900">
+            🎯 Block H: Frontend Core Interface
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+              <span className="text-green-500 text-xl">✅</span>
+              <span className="text-sm font-medium">React 18 + Vite + TypeScript</span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <Link 
-                to="/" 
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100"
-              >
-                <HomeIcon className="h-4 w-4" />
-                <span>Home</span>
-              </Link>
-              
-              {/* NEW: Rule Builder Link */}
-              <Link 
-                to="/rule-builder" 
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100"
-              >
-                <Zap className="h-4 w-4" />
-                <span>Rule Builder</span>
-              </Link>
-              
-              <Link 
-                to="/about" 
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100"
-              >
-                <UserIcon className="h-4 w-4" />
-                <span>About</span>
-              </Link>
-              <Link 
-                to="/settings" 
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100"
-              >
-                <CogIcon className="h-4 w-4" />
-                <span>Settings</span>
-              </Link>
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+              <span className="text-green-500 text-xl">✅</span>
+              <span className="text-sm font-medium">Tailwind CSS Theme System</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+              <span className="text-green-500 text-xl">✅</span>
+              <span className="text-sm font-medium">Zustand State Management</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+              <span className="text-green-500 text-xl">✅</span>
+              <span className="text-sm font-medium">Apollo GraphQL Integration</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+              <span className="text-green-500 text-xl">✅</span>
+              <span className="text-sm font-medium">Analytics Dashboard Ready</span>
+            </div>
+            <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+              <span className="text-blue-500 text-xl">🔄</span>
+              <span className="text-sm font-medium">Development Server Running</span>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-200 pt-6">
+            <div className="flex items-center justify-center space-x-2 text-gray-600">
+              <span>Ready to consume Hades backend APIs</span>
+              <span className="text-2xl">🔥</span>
             </div>
           </div>
         </div>
-      </nav>
-
-      {/* Main content */}
-      <main className="h-[calc(100vh-4rem)]">
-        <Routes>
-          <Route path="/" element={
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-              <Home count={count} setCount={setCount} />
-            </div>
-          } />
+        
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <div className="text-2xl mb-2">📊</div>
+            <h3 className="font-semibold text-gray-900 mb-1">Analytics Dashboard</h3>
+            <p className="text-sm text-gray-600">Real-time metrics and KPIs</p>
+          </div>
           
-          {/* NEW: Rule Builder Route - Full Height */}
-          <Route path="/rule-builder" element={<RuleBuilder />} />
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <div className="text-2xl mb-2">⚛️</div>
+            <h3 className="font-semibold text-gray-900 mb-1">EligibilityAtoms</h3>
+            <p className="text-sm text-gray-600">Reusable decision components</p>
+          </div>
           
-          <Route path="/about" element={
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-              <About />
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <div className="text-2xl mb-2">⏰</div>
+            <h3 className="font-semibold text-gray-900 mb-1">Perfect Moments</h3>
+            <p className="text-sm text-gray-600">Optimal delivery timing</p>
+          </div>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <button className="btn btn-primary px-8 py-3 text-base font-semibold">
+            <span className="mr-2">📊</span>
+            View Dashboard
+          </button>
+          <button className="btn btn-outline px-8 py-3 text-base font-semibold">
+            <span className="mr-2">📚</span>
+            Documentation
+          </button>
+        </div>
+        
+        {/* Dependencies Status */}
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔧 Dependencies Loaded</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>Apollo Client</span>
             </div>
-          } />
-          <Route path="/settings" element={
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-              <Settings />
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>Framer Motion</span>
             </div>
-          } />
-        </Routes>
-      </main>
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>React Query</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>React Router</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>Zustand</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>Lucide Icons</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>Recharts</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-green-500">✅</span>
+              <span>Headless UI</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Footer Info */}
+        <div className="mt-8 text-gray-500 text-sm">
+          <p>Kairos v1.0.0 • Built with React 18, TypeScript & Tailwind CSS</p>
+          <p className="mt-2">🏗️ Ready for Block I: Basic Experimentation</p>
+        </div>
+      </div>
     </div>
   )
 }
