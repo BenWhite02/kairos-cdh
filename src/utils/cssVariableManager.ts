@@ -48,6 +48,8 @@ export interface ThemeCSSVariables {
 export class CSSVariableManager {
   private prefix: string
   private root: HTMLElement
+  private cache: Map<string, string> = new Map()
+  private observers: Set<(variables: CSSVariableMap) => void> = new Set()
 
   constructor(prefix: string = '--kairos') {
     this.prefix = prefix
@@ -61,6 +63,7 @@ export class CSSVariableManager {
     const variables = this.generateThemeVariables(theme)
     this.setVariables(variables)
     this.updateDataAttributes(theme)
+    this.notifyObservers(variables)
   }
 
   /**
@@ -70,254 +73,297 @@ export class CSSVariableManager {
     const variables: CSSVariableMap = {}
 
     // Color variables
-    Object.entries(theme.colors).forEach(([colorGroup, colors]) => {
-      if (typeof colors === 'object') {
-        Object.entries(colors).forEach(([shade, value]) => {
-          variables[`${this.prefix}-color-${colorGroup}-${shade}`] = value
-        })
-      }
-    })
-
+    this.generateColorVariables(theme.colors, variables)
+    
     // Typography variables
-    Object.entries(theme.typography.fontFamily).forEach(([key, value]) => {
-      variables[`${this.prefix}-font-family-${key}`] = Array.isArray(value) ? value.join(', ') : value
-    })
-
-    Object.entries(theme.typography.fontSize).forEach(([key, value]) => {
-      variables[`${this.prefix}-font-size-${key}`] = value
-    })
-
-    Object.entries(theme.typography.fontWeight).forEach(([key, value]) => {
-      variables[`${this.prefix}-font-weight-${key}`] = value.toString()
-    })
-
-    Object.entries(theme.typography.lineHeight).forEach(([key, value]) => {
-      variables[`${this.prefix}-line-height-${key}`] = value.toString()
-    })
-
+    this.generateTypographyVariables(theme.typography, variables)
+    
     // Spacing variables
-    Object.entries(theme.spacing.borderRadius).forEach(([key, value]) => {
-      variables[`${this.prefix}-border-radius-${key}`] = value
-    })
-
-    Object.entries(theme.spacing.spacing).forEach(([key, value]) => {
-      variables[`${this.prefix}-spacing-${key}`] = value
-    })
-
-    Object.entries(theme.spacing.shadows).forEach(([key, value]) => {
-      variables[`${this.prefix}-shadow-${key}`] = value
-    })
-
-    // Semantic variables (derived from colors)
-    variables[`${this.prefix}-background`] = theme.isDark ? theme.colors.gray[900] : theme.colors.gray[50]
-    variables[`${this.prefix}-foreground`] = theme.isDark ? theme.colors.gray[100] : theme.colors.gray[900]
-    variables[`${this.prefix}-muted`] = theme.isDark ? theme.colors.gray[700] : theme.colors.gray[200]
-    variables[`${this.prefix}-muted-foreground`] = theme.isDark ? theme.colors.gray[400] : theme.colors.gray[600]
-    variables[`${this.prefix}-border`] = theme.isDark ? theme.colors.gray[700] : theme.colors.gray[200]
-    variables[`${this.prefix}-input`] = theme.isDark ? theme.colors.gray[800] : theme.colors.gray[100]
-    variables[`${this.prefix}-card`] = theme.isDark ? theme.colors.gray[800] : '#ffffff'
-    variables[`${this.prefix}-card-foreground`] = theme.isDark ? theme.colors.gray[100] : theme.colors.gray[900]
-    variables[`${this.prefix}-popover`] = theme.isDark ? theme.colors.gray[800] : '#ffffff'
-    variables[`${this.prefix}-popover-foreground`] = theme.isDark ? theme.colors.gray[100] : theme.colors.gray[900]
+    this.generateSpacingVariables(theme.spacing, variables)
+    
+    // Theme metadata
+    variables[`${this.prefix}-theme-id`] = theme.id
+    variables[`${this.prefix}-theme-name`] = theme.name
+    variables[`${this.prefix}-is-dark`] = theme.isDark ? '1' : '0'
 
     return variables
   }
 
   /**
-   * Set CSS custom properties on the root element
+   * Generate color CSS variables
    */
-  setVariables(variables: CSSVariableMap): void {
-    Object.entries(variables).forEach(([property, value]) => {
-      this.root.style.setProperty(property, value.toString())
+  private generateColorVariables(colors: ThemeColors, variables: CSSVariableMap): void {
+    Object.entries(colors).forEach(([colorGroup, colorShades]) => {
+      if (typeof colorShades === 'object') {
+        Object.entries(colorShades).forEach(([shade, value]) => {
+          variables[`${this.prefix}-color-${colorGroup}-${shade}`] = value
+          
+          // Generate HSL variants for better manipulation
+          const hsl = this.hexToHsl(value)
+          if (hsl) {
+            variables[`${this.prefix}-color-${colorGroup}-${shade}-h`] = hsl.h
+            variables[`${this.prefix}-color-${colorGroup}-${shade}-s`] = hsl.s
+            variables[`${this.prefix}-color-${colorGroup}-${shade}-l`] = hsl.l
+          }
+        })
+      }
     })
   }
 
   /**
-   * Set a single CSS variable
+   * Generate typography CSS variables
    */
-  setVariable(property: string, value: string | number): void {
-    const fullProperty = property.startsWith('--') ? property : `${this.prefix}-${property}`
-    this.root.style.setProperty(fullProperty, value.toString())
+  private generateTypographyVariables(typography: any, variables: CSSVariableMap): void {
+    // Font families
+    Object.entries(typography.fontFamily).forEach(([key, value]) => {
+      variables[`${this.prefix}-font-family-${key}`] = Array.isArray(value) 
+        ? value.join(', ') 
+        : value
+    })
+
+    // Font sizes
+    Object.entries(typography.fontSize).forEach(([key, value]) => {
+      variables[`${this.prefix}-font-size-${key}`] = value
+    })
+
+    // Font weights
+    Object.entries(typography.fontWeight).forEach(([key, value]) => {
+      variables[`${this.prefix}-font-weight-${key}`] = value
+    })
+
+    // Line heights
+    Object.entries(typography.lineHeight).forEach(([key, value]) => {
+      variables[`${this.prefix}-line-height-${key}`] = value
+    })
   }
 
   /**
-   * Get a CSS variable value
+   * Generate spacing CSS variables
    */
-  getVariable(property: string): string {
-    const fullProperty = property.startsWith('--') ? property : `${this.prefix}-${property}`
-    return getComputedStyle(this.root).getPropertyValue(fullProperty).trim()
+  private generateSpacingVariables(spacing: any, variables: CSSVariableMap): void {
+    // Border radius
+    Object.entries(spacing.borderRadius).forEach(([key, value]) => {
+      variables[`${this.prefix}-border-radius-${key}`] = value
+    })
+
+    // Spacing scale
+    Object.entries(spacing.spacing).forEach(([key, value]) => {
+      variables[`${this.prefix}-spacing-${key}`] = value
+    })
+
+    // Shadows
+    Object.entries(spacing.shadows).forEach(([key, value]) => {
+      variables[`${this.prefix}-shadow-${key}`] = value
+    })
   }
 
   /**
-   * Remove a CSS variable
+   * Set CSS variables on root element
    */
-  removeVariable(property: string): void {
-    const fullProperty = property.startsWith('--') ? property : `${this.prefix}-${property}`
-    this.root.style.removeProperty(fullProperty)
+  setVariables(variables: CSSVariableMap): void {
+    Object.entries(variables).forEach(([key, value]) => {
+      this.root.style.setProperty(key, String(value))
+      this.cache.set(key, String(value))
+    })
   }
 
   /**
-   * Update data attributes for theme identification
+   * Get CSS variable value
    */
-  updateDataAttributes(theme: ThemeDefinition): void {
+  getVariable(name: string): string | null {
+    const fullName = name.startsWith('--') ? name : `${this.prefix}-${name}`
+    return this.cache.get(fullName) || getComputedStyle(this.root).getPropertyValue(fullName) || null
+  }
+
+  /**
+   * Set individual CSS variable
+   */
+  setVariable(name: string, value: string | number): void {
+    const fullName = name.startsWith('--') ? name : `${this.prefix}-${name}`
+    this.root.style.setProperty(fullName, String(value))
+    this.cache.set(fullName, String(value))
+  }
+
+  /**
+   * Remove CSS variable
+   */
+  removeVariable(name: string): void {
+    const fullName = name.startsWith('--') ? name : `${this.prefix}-${name}`
+    this.root.style.removeProperty(fullName)
+    this.cache.delete(fullName)
+  }
+
+  /**
+   * Update data attributes for theme information
+   */
+  private updateDataAttributes(theme: ThemeDefinition): void {
     this.root.setAttribute('data-theme', theme.id)
-    this.root.setAttribute('data-theme-mode', theme.isDark ? 'dark' : 'light')
+    this.root.setAttribute('data-theme-type', theme.isDark ? 'dark' : 'light')
+    this.root.setAttribute('data-theme-custom', theme.isCustom ? 'true' : 'false')
     
-    // Update class for Tailwind compatibility
+    // Update class for CSS targeting
+    this.root.className = this.root.className.replace(/theme-\w+/g, '')
+    this.root.classList.add(`theme-${theme.id}`)
+    
     if (theme.isDark) {
       this.root.classList.add('dark')
+      this.root.classList.remove('light')
     } else {
+      this.root.classList.add('light')
       this.root.classList.remove('dark')
     }
   }
 
   /**
-   * Generate CSS custom property declarations as string
+   * Convert hex color to HSL
    */
-  generateCSSString(theme: ThemeDefinition): string {
-    const variables = this.generateThemeVariables(theme)
-    const declarations = Object.entries(variables)
-      .map(([property, value]) => `  ${property}: ${value};`)
+  private hexToHsl(hex: string): { h: number; s: number; l: number } | null {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    if (!result) return null
+
+    const r = parseInt(result[1], 16) / 255
+    const g = parseInt(result[2], 16) / 255
+    const b = parseInt(result[3], 16) / 255
+
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    let h: number
+    let s: number
+    const l = (max + min) / 2
+
+    if (max === min) {
+      h = s = 0 // achromatic
+    } else {
+      const d = max - min
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0)
+          break
+        case g:
+          h = (b - r) / d + 2
+          break
+        case b:
+          h = (r - g) / d + 4
+          break
+        default:
+          h = 0
+      }
+
+      h /= 6
+    }
+
+    return {
+      h: Math.round(h * 360),
+      s: Math.round(s * 100),
+      l: Math.round(l * 100)
+    }
+  }
+
+  /**
+   * Generate CSS from current variables
+   */
+  generateCSS(): string {
+    const variables = Array.from(this.cache.entries())
+      .map(([key, value]) => `  ${key}: ${value};`)
       .join('\n')
 
-    return `:root {\n${declarations}\n}`
+    return `:root {\n${variables}\n}`
   }
 
   /**
-   * Apply custom color overrides
+   * Add observer for variable changes
    */
-  applyCustomColors(colors: Record<string, string>): void {
-    Object.entries(colors).forEach(([property, value]) => {
-      this.setVariable(`color-custom-${property}`, value)
+  addObserver(observer: (variables: CSSVariableMap) => void): void {
+    this.observers.add(observer)
+  }
+
+  /**
+   * Remove observer
+   */
+  removeObserver(observer: (variables: CSSVariableMap) => void): void {
+    this.observers.delete(observer)
+  }
+
+  /**
+   * Notify observers of variable changes
+   */
+  private notifyObservers(variables: CSSVariableMap): void {
+    this.observers.forEach(observer => observer(variables))
+  }
+
+  /**
+   * Reset all theme variables
+   */
+  reset(): void {
+    this.cache.forEach((_, key) => {
+      this.root.style.removeProperty(key)
     })
-  }
-
-  /**
-   * Apply component-specific variables
-   */
-  applyComponentVariables(component: string, variables: Record<string, string>): void {
-    Object.entries(variables).forEach(([property, value]) => {
-      this.setVariable(`${component}-${property}`, value)
-    })
-  }
-
-  /**
-   * Clear all theme variables
-   */
-  clearThemeVariables(): void {
-    const styles = this.root.style
-    for (let i = styles.length - 1; i >= 0; i--) {
-      const property = styles[i]
-      if (property.startsWith(this.prefix)) {
-        this.root.style.removeProperty(property)
-      }
-    }
-  }
-
-  /**
-   * Get all current theme variables
-   */
-  getAllThemeVariables(): Record<string, string> {
-    const variables: Record<string, string> = {}
-    const computedStyles = getComputedStyle(this.root)
+    this.cache.clear()
     
-    for (let i = 0; i < computedStyles.length; i++) {
-      const property = computedStyles[i]
-      if (property.startsWith(this.prefix)) {
-        variables[property] = computedStyles.getPropertyValue(property).trim()
-      }
-    }
-    
-    return variables
+    // Reset data attributes
+    this.root.removeAttribute('data-theme')
+    this.root.removeAttribute('data-theme-type')
+    this.root.removeAttribute('data-theme-custom')
+    this.root.className = this.root.className.replace(/theme-\w+|dark|light/g, '')
   }
 
   /**
-   * Create scoped variables for a specific element
-   */
-  applyScopedTheme(element: HTMLElement, theme: ThemeDefinition): void {
-    const variables = this.generateThemeVariables(theme)
-    Object.entries(variables).forEach(([property, value]) => {
-      element.style.setProperty(property, value.toString())
-    })
-    element.setAttribute('data-theme', theme.id)
-  }
-
-  /**
-   * Generate theme-aware utility classes
+   * Create CSS utility classes for current theme
    */
   generateUtilityClasses(): string {
-    return `
-      .theme-bg-primary { background-color: var(${this.prefix}-color-primary-500); }
-      .theme-bg-secondary { background-color: var(${this.prefix}-color-secondary-500); }
-      .theme-bg-accent { background-color: var(${this.prefix}-color-accent-500); }
-      .theme-bg-success { background-color: var(${this.prefix}-color-success-500); }
-      .theme-bg-warning { background-color: var(${this.prefix}-color-warning-500); }
-      .theme-bg-error { background-color: var(${this.prefix}-color-error-500); }
-      .theme-bg-info { background-color: var(${this.prefix}-color-info-500); }
-      
-      .theme-text-primary { color: var(${this.prefix}-color-primary-500); }
-      .theme-text-secondary { color: var(${this.prefix}-color-secondary-500); }
-      .theme-text-accent { color: var(${this.prefix}-color-accent-500); }
-      .theme-text-success { color: var(${this.prefix}-color-success-500); }
-      .theme-text-warning { color: var(${this.prefix}-color-warning-500); }
-      .theme-text-error { color: var(${this.prefix}-color-error-500); }
-      .theme-text-info { color: var(${this.prefix}-color-info-500); }
-      
-      .theme-border-primary { border-color: var(${this.prefix}-color-primary-500); }
-      .theme-border-secondary { border-color: var(${this.prefix}-color-secondary-500); }
-      .theme-border-accent { border-color: var(${this.prefix}-color-accent-500); }
-      
-      .theme-bg { background-color: var(${this.prefix}-background); }
-      .theme-fg { color: var(${this.prefix}-foreground); }
-      .theme-muted { background-color: var(${this.prefix}-muted); }
-      .theme-muted-fg { color: var(${this.prefix}-muted-foreground); }
-      .theme-border { border-color: var(${this.prefix}-border); }
-      .theme-input { background-color: var(${this.prefix}-input); }
-      .theme-card { background-color: var(${this.prefix}-card); }
-      .theme-card-fg { color: var(${this.prefix}-card-foreground); }
-      .theme-popover { background-color: var(${this.prefix}-popover); }
-      .theme-popover-fg { color: var(${this.prefix}-popover-foreground); }
-    `
+    const utilities: string[] = []
+
+    // Generate color utilities
+    this.cache.forEach((value, key) => {
+      if (key.includes('-color-')) {
+        const className = key.replace(`${this.prefix}-`, '').replace(/-/g, '-')
+        utilities.push(`.${className} { color: var(${key}); }`)
+        utilities.push(`.bg-${className} { background-color: var(${key}); }`)
+        utilities.push(`.border-${className} { border-color: var(${key}); }`)
+      }
+    })
+
+    return utilities.join('\n')
   }
 }
 
 // =============================================================================
-// UTILITY FUNCTIONS
+// THEME TRANSITION MANAGER
 // =============================================================================
 
-export const createCSSVariableManager = (prefix?: string): CSSVariableManager => {
-  return new CSSVariableManager(prefix)
-}
+export class ThemeTransitionManager {
+  private cssManager: CSSVariableManager
+  private transitionDuration: number
 
-export const applyThemeToElement = (element: HTMLElement, theme: ThemeDefinition, prefix?: string): void => {
-  const manager = new CSSVariableManager(prefix)
-  manager.applyScopedTheme(element, theme)
-}
-
-export const generateThemeCSS = (theme: ThemeDefinition, prefix?: string): string => {
-  const manager = new CSSVariableManager(prefix)
-  return manager.generateCSSString(theme)
-}
-
-export const injectUtilityClasses = (prefix?: string): void => {
-  const manager = new CSSVariableManager(prefix)
-  const css = manager.generateUtilityClasses()
-  
-  const styleElement = document.createElement('style')
-  styleElement.id = 'kairos-theme-utilities'
-  styleElement.textContent = css
-  
-  // Remove existing utility styles
-  const existing = document.getElementById('kairos-theme-utilities')
-  if (existing) {
-    existing.remove()
+  constructor(cssManager: CSSVariableManager, transitionDuration: number = 200) {
+    this.cssManager = cssManager
+    this.transitionDuration = transitionDuration
   }
-  
-  document.head.appendChild(styleElement)
+
+  /**
+   * Apply theme with smooth transition
+   */
+  async applyThemeWithTransition(theme: ThemeDefinition): Promise<void> {
+    return new Promise((resolve) => {
+      // Add transition class
+      document.documentElement.classList.add('theme-transitioning')
+      
+      // Apply theme
+      this.cssManager.applyTheme(theme)
+      
+      // Remove transition class after animation
+      setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning')
+        resolve()
+      }, this.transitionDuration)
+    })
+  }
 }
 
 // =============================================================================
-// DEFAULT EXPORT
+// EXPORTS
 // =============================================================================
 
 export default CSSVariableManager

@@ -1,133 +1,100 @@
+// File: kairos-frontend/tailwind.config.js
+// Tailwind CSS configuration for Kairos themes
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./.storybook/**/*.{js,ts,jsx,tsx}",
   ],
-  
-  // Enable dark mode via class
-  darkMode: 'class',
-  
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     extend: {
-      // Kairos Brand Colors - The Perfect Moment Palette
+      // Colors using CSS custom properties for theme switching
       colors: {
-        // Primary - Kairos Blue (representing time and precision)
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6', // Main Kairos blue
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          DEFAULT: 'var(--kairos-color-primary)',
+          hover: 'var(--kairos-color-primary-hover)',
+          active: 'var(--kairos-color-primary-active)',
         },
-        
-        // Secondary - Temporal Gold (highlighting perfect moments)
-        secondary: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308', // Main temporal gold
-          600: '#ca8a04',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
-          950: '#422006',
+        secondary: 'var(--kairos-color-secondary)',
+        accent: 'var(--kairos-color-accent)',
+        background: {
+          DEFAULT: 'var(--kairos-color-background)',
+          secondary: 'var(--kairos-color-background-secondary)',
         },
-        
-        // Accent - Moment Purple (for highlights and calls-to-action)
-        accent: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#a855f7', // Main moment purple
-          600: '#9333ea',
-          700: '#7c3aed',
-          800: '#6b21a8',
-          900: '#581c87',
-          950: '#3b0764',
+        surface: {
+          DEFAULT: 'var(--kairos-color-surface)',
+          hover: 'var(--kairos-color-surface-hover)',
         },
-        
-        // Success - for positive analytics metrics
-        success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+        text: {
+          DEFAULT: 'var(--kairos-color-text)',
+          secondary: 'var(--kairos-color-text-secondary)',
+          muted: 'var(--kairos-color-text-muted)',
         },
-        
-        // Warning - for attention-needed metrics
-        warning: {
-          50: '#fefce8',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
+        border: {
+          DEFAULT: 'var(--kairos-color-border)',
+          light: 'var(--kairos-color-border-light)',
         },
-        
-        // Error - for negative metrics and alerts
-        error: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-        },
+        success: 'var(--kairos-color-success)',
+        warning: 'var(--kairos-color-warning)',
+        error: 'var(--kairos-color-error)',
+        info: 'var(--kairos-color-info)',
       },
       
-      // Custom fonts for Kairos
+      // Typography using CSS custom properties
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Merriweather', 'serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-        display: ['Poppins', 'sans-serif'], // For headings and logos
+        sans: ['var(--kairos-font-family)', 'system-ui', 'sans-serif'],
+        mono: ['var(--kairos-font-family-mono)', 'monospace'],
       },
       
-      // Custom spacing for the Kairos design system
+      // Shadows using CSS custom properties
+      boxShadow: {
+        sm: 'var(--kairos-shadow-sm)',
+        DEFAULT: 'var(--kairos-shadow-md)',
+        md: 'var(--kairos-shadow-md)',
+        lg: 'var(--kairos-shadow-lg)',
+        xl: 'var(--kairos-shadow-xl)',
+      },
+      
+      // Border radius using CSS custom properties
+      borderRadius: {
+        sm: 'var(--kairos-border-radius-sm)',
+        DEFAULT: 'var(--kairos-border-radius-md)',
+        md: 'var(--kairos-border-radius-md)',
+        lg: 'var(--kairos-border-radius-lg)',
+      },
+      
+      // Animation durations using CSS custom properties
+      transitionDuration: {
+        fast: 'var(--kairos-animation-duration-fast)',
+        normal: 'var(--kairos-animation-duration-normal)',
+        slow: 'var(--kairos-animation-duration-slow)',
+      },
+      
+      // Custom spacing scale
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
         '128': '32rem',
       },
       
-      // Custom animations for "the perfect moment" theme
+      // Custom breakpoints for perfect moment delivery
+      screens: {
+        'xs': '475px',
+        '3xl': '1920px',
+      },
+      
+      // Animation utilities
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'fade-in': 'fadeIn 0.3s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
         'slide-down': 'slideDown 0.3s ease-out',
         'scale-in': 'scaleIn 0.2s ease-out',
         'pulse-soft': 'pulseSoft 2s infinite',
-        'moment-glow': 'momentGlow 3s ease-in-out infinite',
-        'data-flow': 'dataFlow 20s linear infinite',
+        'float': 'float 3s ease-in-out infinite',
       },
       
-      // Custom keyframes
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
@@ -142,122 +109,152 @@ export default {
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '0%': { transform: 'scale(0.9)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
         pulseSoft: {
           '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.8' },
+          '50%': { opacity: '0.7' },
         },
-        momentGlow: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
-          '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.8)' },
-        },
-        dataFlow: {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(100vw)' },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-5px)' },
         },
       },
       
-      // Custom border radius
-      borderRadius: {
-        'xl': '1rem',
-        '2xl': '1.5rem',
-        '3xl': '2rem',
+      // Grid templates for complex layouts
+      gridTemplateColumns: {
+        'auto-fit-250': 'repeat(auto-fit, minmax(250px, 1fr))',
+        'auto-fit-300': 'repeat(auto-fit, minmax(300px, 1fr))',
+        'auto-fill-250': 'repeat(auto-fill, minmax(250px, 1fr))',
       },
       
-      // Custom shadows for depth
-      boxShadow: {
-        'kairos': '0 4px 20px rgba(59, 130, 246, 0.15)',
-        'moment': '0 8px 40px rgba(168, 85, 247, 0.2)',
-        'data': '0 2px 10px rgba(0, 0, 0, 0.1)',
+      // Backdrop blur utilities
+      backdropBlur: {
+        xs: '2px',
       },
       
-      // Custom gradients
-      backgroundImage: {
-        'gradient-kairos': 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-        'gradient-moment': 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-        'gradient-data': 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+      // Custom aspect ratios
+      aspectRatio: {
+        '4/3': '4 / 3',
+        '3/2': '3 / 2',
+        '2/3': '2 / 3',
+        '9/16': '9 / 16',
       },
     },
   },
-  
   plugins: [
-    require('@tailwindcss/forms'),
+    // Forms plugin for better form styling
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
+    
+    // Typography plugin for rich text content
     require('@tailwindcss/typography'),
+    
+    // Aspect ratio plugin
     require('@tailwindcss/aspect-ratio'),
     
-    // Custom plugin for theme variables and component classes
-    function({ addBase, addComponents, theme }) {
-      addBase({
-        ':root': {
-          '--color-primary': theme('colors.primary.500'),
-          '--color-secondary': theme('colors.secondary.500'),
-          '--color-accent': theme('colors.accent.500'),
-          '--shadow-kairos': theme('boxShadow.kairos'),
-          '--gradient-kairos': theme('backgroundImage.gradient-kairos'),
+    // Container queries plugin
+    require('@tailwindcss/container-queries'),
+    
+    // Custom plugin for Kairos-specific utilities
+    function({ addUtilities, addComponents, theme }) {
+      // Custom utilities
+      addUtilities({
+        '.text-balance': {
+          'text-wrap': 'balance',
         },
-        '.dark': {
-          '--color-primary': theme('colors.primary.400'),
-          '--color-secondary': theme('colors.secondary.400'),
-          '--color-accent': theme('colors.accent.400'),
-        }
-      })
+        '.text-pretty': {
+          'text-wrap': 'pretty',
+        },
+        '.scrollbar-hide': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+        '.scrollbar-thin': {
+          'scrollbar-width': 'thin',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+            height: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            'background-color': 'var(--kairos-color-background-secondary)',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            'background-color': 'var(--kairos-color-border)',
+            'border-radius': '3px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            'background-color': 'var(--kairos-color-text-muted)',
+          },
+        },
+      });
       
+      // Custom components
       addComponents({
-        // Button components
-        '.btn': {
-          '@apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none': {},
+        '.kairos-card': {
+          'background-color': 'var(--kairos-color-surface)',
+          'border': '1px solid var(--kairos-color-border)',
+          'border-radius': 'var(--kairos-border-radius-md)',
+          'box-shadow': 'var(--kairos-shadow-sm)',
+          'transition': 'all var(--kairos-animation-duration-fast) ease-in-out',
+          '&:hover': {
+            'background-color': 'var(--kairos-color-surface-hover)',
+            'box-shadow': 'var(--kairos-shadow-md)',
+          },
         },
-        '.btn-primary': {
-          '@apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800': {},
+        '.kairos-button': {
+          'background-color': 'var(--kairos-color-primary)',
+          'color': 'white',
+          'border-radius': 'var(--kairos-border-radius-md)',
+          'padding': '0.5rem 1rem',
+          'font-weight': '500',
+          'transition': 'all var(--kairos-animation-duration-fast) ease-in-out',
+          '&:hover': {
+            'background-color': 'var(--kairos-color-primary-hover)',
+            'transform': 'translateY(-1px)',
+          },
+          '&:active': {
+            'background-color': 'var(--kairos-color-primary-active)',
+            'transform': 'translateY(0)',
+          },
+          '&:disabled': {
+            'opacity': '0.5',
+            'cursor': 'not-allowed',
+            'transform': 'none',
+          },
         },
-        '.btn-secondary': {
-          '@apply bg-secondary-100 text-secondary-900 hover:bg-secondary-200 active:bg-secondary-300': {},
+        '.kairos-input': {
+          'background-color': 'var(--kairos-color-background)',
+          'border': '1px solid var(--kairos-color-border)',
+          'border-radius': 'var(--kairos-border-radius-md)',
+          'padding': '0.5rem 0.75rem',
+          'color': 'var(--kairos-color-text)',
+          'transition': 'all var(--kairos-animation-duration-fast) ease-in-out',
+          '&:focus': {
+            'outline': 'none',
+            'border-color': 'var(--kairos-color-primary)',
+            'box-shadow': '0 0 0 3px rgb(from var(--kairos-color-primary) r g b / 0.1)',
+          },
+          '&::placeholder': {
+            'color': 'var(--kairos-color-text-muted)',
+          },
         },
-        '.btn-outline': {
-          '@apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100': {},
+        '.kairos-badge': {
+          'background-color': 'var(--kairos-color-primary)',
+          'color': 'white',
+          'border-radius': 'var(--kairos-border-radius-lg)',
+          'padding': '0.25rem 0.5rem',
+          'font-size': '0.75rem',
+          'font-weight': '500',
+          'text-transform': 'uppercase',
+          'letter-spacing': '0.025em',
         },
-        '.btn-ghost': {
-          '@apply text-gray-700 hover:bg-gray-100 active:bg-gray-200': {},
-        },
-        '.btn-destructive': {
-          '@apply bg-red-600 text-white hover:bg-red-700 active:bg-red-800': {},
-        },
-        
-        // Card component
-        '.card': {
-          '@apply bg-white rounded-lg shadow-sm border border-gray-200 p-6': {},
-        },
-        
-        // Input components
-        '.input': {
-          '@apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm': {},
-        },
-        '.label': {
-          '@apply block text-sm font-medium text-gray-700 mb-1': {},
-        },
-        
-        // Badge components
-        '.badge': {
-          '@apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium': {},
-        },
-        '.badge-primary': {
-          '@apply bg-primary-100 text-primary-800': {},
-        },
-        '.badge-secondary': {
-          '@apply bg-gray-100 text-gray-800': {},
-        },
-        '.badge-success': {
-          '@apply bg-green-100 text-green-800': {},
-        },
-        '.badge-warning': {
-          '@apply bg-yellow-100 text-yellow-800': {},
-        },
-        '.badge-error': {
-          '@apply bg-red-100 text-red-800': {},
-        },
-      })
-    }
+      });
+    },
   ],
-}
+};

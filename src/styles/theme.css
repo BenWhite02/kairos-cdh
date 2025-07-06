@@ -1,0 +1,449 @@
+/* File: src/styles/theme.css */
+/* 🎨 Base Theme Styles for Kairos Frontend */
+/* All styles kept in classes as per project requirements */
+/* Supports theme switching with CSS variables and utility classes */
+
+/* =============================================================================
+   ROOT VARIABLES & THEME TRANSITIONS
+   ============================================================================= */
+
+:root {
+  /* Base theme variables will be injected by CSSVariableManager */
+  --kairos-transition-duration: 200ms;
+  --kairos-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme transition class */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: 
+    background-color var(--kairos-transition-duration) var(--kairos-transition-timing),
+    border-color var(--kairos-transition-duration) var(--kairos-transition-timing),
+    color var(--kairos-transition-duration) var(--kairos-transition-timing),
+    fill var(--kairos-transition-duration) var(--kairos-transition-timing),
+    stroke var(--kairos-transition-duration) var(--kairos-transition-timing),
+    box-shadow var(--kairos-transition-duration) var(--kairos-transition-timing) !important;
+}
+
+/* =============================================================================
+   THEME-AWARE BASE STYLES
+   ============================================================================= */
+
+/* Body and HTML */
+.theme-body {
+  background-color: var(--kairos-color-gray-50);
+  color: var(--kairos-color-gray-900);
+  font-family: var(--kairos-font-family-sans);
+  font-size: var(--kairos-font-size-base);
+  line-height: var(--kairos-line-height-normal);
+  transition: background-color var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
+
+.dark .theme-body {
+  background-color: var(--kairos-color-gray-900);
+  color: var(--kairos-color-gray-100);
+}
+
+/* =============================================================================
+   COLOR UTILITY CLASSES
+   ============================================================================= */
+
+/* Primary colors */
+.text-primary-50 { color: var(--kairos-color-primary-50); }
+.text-primary-100 { color: var(--kairos-color-primary-100); }
+.text-primary-200 { color: var(--kairos-color-primary-200); }
+.text-primary-300 { color: var(--kairos-color-primary-300); }
+.text-primary-400 { color: var(--kairos-color-primary-400); }
+.text-primary-500 { color: var(--kairos-color-primary-500); }
+.text-primary-600 { color: var(--kairos-color-primary-600); }
+.text-primary-700 { color: var(--kairos-color-primary-700); }
+.text-primary-800 { color: var(--kairos-color-primary-800); }
+.text-primary-900 { color: var(--kairos-color-primary-900); }
+.text-primary-950 { color: var(--kairos-color-primary-950); }
+
+.bg-primary-50 { background-color: var(--kairos-color-primary-50); }
+.bg-primary-100 { background-color: var(--kairos-color-primary-100); }
+.bg-primary-200 { background-color: var(--kairos-color-primary-200); }
+.bg-primary-300 { background-color: var(--kairos-color-primary-300); }
+.bg-primary-400 { background-color: var(--kairos-color-primary-400); }
+.bg-primary-500 { background-color: var(--kairos-color-primary-500); }
+.bg-primary-600 { background-color: var(--kairos-color-primary-600); }
+.bg-primary-700 { background-color: var(--kairos-color-primary-700); }
+.bg-primary-800 { background-color: var(--kairos-color-primary-800); }
+.bg-primary-900 { background-color: var(--kairos-color-primary-900); }
+.bg-primary-950 { background-color: var(--kairos-color-primary-950); }
+
+.border-primary-50 { border-color: var(--kairos-color-primary-50); }
+.border-primary-100 { border-color: var(--kairos-color-primary-100); }
+.border-primary-200 { border-color: var(--kairos-color-primary-200); }
+.border-primary-300 { border-color: var(--kairos-color-primary-300); }
+.border-primary-400 { border-color: var(--kairos-color-primary-400); }
+.border-primary-500 { border-color: var(--kairos-color-primary-500); }
+.border-primary-600 { border-color: var(--kairos-color-primary-600); }
+.border-primary-700 { border-color: var(--kairos-color-primary-700); }
+.border-primary-800 { border-color: var(--kairos-color-primary-800); }
+.border-primary-900 { border-color: var(--kairos-color-primary-900); }
+.border-primary-950 { border-color: var(--kairos-color-primary-950); }
+
+/* Secondary colors */
+.text-secondary-50 { color: var(--kairos-color-secondary-50); }
+.text-secondary-100 { color: var(--kairos-color-secondary-100); }
+.text-secondary-200 { color: var(--kairos-color-secondary-200); }
+.text-secondary-300 { color: var(--kairos-color-secondary-300); }
+.text-secondary-400 { color: var(--kairos-color-secondary-400); }
+.text-secondary-500 { color: var(--kairos-color-secondary-500); }
+.text-secondary-600 { color: var(--kairos-color-secondary-600); }
+.text-secondary-700 { color: var(--kairos-color-secondary-700); }
+.text-secondary-800 { color: var(--kairos-color-secondary-800); }
+.text-secondary-900 { color: var(--kairos-color-secondary-900); }
+.text-secondary-950 { color: var(--kairos-color-secondary-950); }
+
+.bg-secondary-50 { background-color: var(--kairos-color-secondary-50); }
+.bg-secondary-100 { background-color: var(--kairos-color-secondary-100); }
+.bg-secondary-200 { background-color: var(--kairos-color-secondary-200); }
+.bg-secondary-300 { background-color: var(--kairos-color-secondary-300); }
+.bg-secondary-400 { background-color: var(--kairos-color-secondary-400); }
+.bg-secondary-500 { background-color: var(--kairos-color-secondary-500); }
+.bg-secondary-600 { background-color: var(--kairos-color-secondary-600); }
+.bg-secondary-700 { background-color: var(--kairos-color-secondary-700); }
+.bg-secondary-800 { background-color: var(--kairos-color-secondary-800); }
+.bg-secondary-900 { background-color: var(--kairos-color-secondary-900); }
+.bg-secondary-950 { background-color: var(--kairos-color-secondary-950); }
+
+.border-secondary-50 { border-color: var(--kairos-color-secondary-50); }
+.border-secondary-100 { border-color: var(--kairos-color-secondary-100); }
+.border-secondary-200 { border-color: var(--kairos-color-secondary-200); }
+.border-secondary-300 { border-color: var(--kairos-color-secondary-300); }
+.border-secondary-400 { border-color: var(--kairos-color-secondary-400); }
+.border-secondary-500 { border-color: var(--kairos-color-secondary-500); }
+.border-secondary-600 { border-color: var(--kairos-color-secondary-600); }
+.border-secondary-700 { border-color: var(--kairos-color-secondary-700); }
+.border-secondary-800 { border-color: var(--kairos-color-secondary-800); }
+.border-secondary-900 { border-color: var(--kairos-color-secondary-900); }
+.border-secondary-950 { border-color: var(--kairos-color-secondary-950); }
+
+/* =============================================================================
+   COMPONENT CLASSES
+   ============================================================================= */
+
+/* Card components */
+.card-base {
+  background-color: var(--kairos-color-gray-100);
+  border: 1px solid var(--kairos-color-gray-200);
+  border-radius: var(--kairos-border-radius-lg);
+  box-shadow: var(--kairos-shadow-sm);
+  transition: all var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
+
+.dark .card-base {
+  background-color: var(--kairos-color-gray-800);
+  border-color: var(--kairos-color-gray-700);
+}
+
+.card-hover:hover {
+  box-shadow: var(--kairos-shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Button components */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--kairos-border-radius-md);
+  font-weight: var(--kairos-font-weight-medium);
+  font-size: var(--kairos-font-size-sm);
+  line-height: var(--kairos-line-height-tight);
+  transition: all var(--kairos-transition-duration) var(--kairos-transition-timing);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background-color: var(--kairos-color-primary-600);
+  color: var(--kairos-color-gray-50);
+  border-color: var(--kairos-color-primary-600);
+}
+
+.btn-primary:hover {
+  background-color: var(--kairos-color-primary-700);
+  border-color: var(--kairos-color-primary-700);
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0 2px var(--kairos-color-primary-200);
+}
+
+.btn-secondary {
+  background-color: var(--kairos-color-secondary-600);
+  color: var(--kairos-color-gray-50);
+  border-color: var(--kairos-color-secondary-600);
+}
+
+.btn-secondary:hover {
+  background-color: var(--kairos-color-secondary-700);
+  border-color: var(--kairos-color-secondary-700);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--kairos-color-primary-600);
+  border-color: var(--kairos-color-primary-600);
+}
+
+.btn-outline:hover {
+  background-color: var(--kairos-color-primary-600);
+  color: var(--kairos-color-gray-50);
+}
+
+/* Input components */
+.input-base {
+  width: 100%;
+  background-color: var(--kairos-color-gray-100);
+  border: 1px solid var(--kairos-color-gray-300);
+  border-radius: var(--kairos-border-radius-md);
+  color: var(--kairos-color-gray-900);
+  font-size: var(--kairos-font-size-sm);
+  line-height: var(--kairos-line-height-normal);
+  transition: all var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
+
+.dark .input-base {
+  background-color: var(--kairos-color-gray-700);
+  border-color: var(--kairos-color-gray-600);
+  color: var(--kairos-color-gray-100);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--kairos-color-primary-500);
+  box-shadow: 0 0 0 2px var(--kairos-color-primary-200);
+}
+
+.dark .input-base:focus {
+  border-color: var(--kairos-color-primary-400);
+  box-shadow: 0 0 0 2px var(--kairos-color-primary-800);
+}
+
+/* =============================================================================
+   SEMANTIC COLOR CLASSES
+   ============================================================================= */
+
+/* Success states */
+.text-success { color: var(--kairos-color-success-700); }
+.bg-success { background-color: var(--kairos-color-success-50); }
+.border-success { border-color: var(--kairos-color-success-500); }
+
+.dark .text-success { color: var(--kairos-color-success-500); }
+.dark .bg-success { background-color: var(--kairos-color-success-700); }
+
+/* Warning states */
+.text-warning { color: var(--kairos-color-warning-700); }
+.bg-warning { background-color: var(--kairos-color-warning-50); }
+.border-warning { border-color: var(--kairos-color-warning-500); }
+
+.dark .text-warning { color: var(--kairos-color-warning-500); }
+.dark .bg-warning { background-color: var(--kairos-color-warning-700); }
+
+/* Error states */
+.text-error { color: var(--kairos-color-error-700); }
+.bg-error { background-color: var(--kairos-color-error-50); }
+.border-error { border-color: var(--kairos-color-error-500); }
+
+.dark .text-error { color: var(--kairos-color-error-500); }
+.dark .bg-error { background-color: var(--kairos-color-error-700); }
+
+/* Info states */
+.text-info { color: var(--kairos-color-info-700); }
+.bg-info { background-color: var(--kairos-color-info-50); }
+.border-info { border-color: var(--kairos-color-info-500); }
+
+.dark .text-info { color: var(--kairos-color-info-500); }
+.dark .bg-info { background-color: var(--kairos-color-info-700); }
+
+/* =============================================================================
+   TYPOGRAPHY CLASSES
+   ============================================================================= */
+
+.font-sans { font-family: var(--kairos-font-family-sans); }
+.font-serif { font-family: var(--kairos-font-family-serif); }
+.font-mono { font-family: var(--kairos-font-family-mono); }
+
+.text-xs { font-size: var(--kairos-font-size-xs); }
+.text-sm { font-size: var(--kairos-font-size-sm); }
+.text-base { font-size: var(--kairos-font-size-base); }
+.text-lg { font-size: var(--kairos-font-size-lg); }
+.text-xl { font-size: var(--kairos-font-size-xl); }
+.text-2xl { font-size: var(--kairos-font-size-2xl); }
+.text-3xl { font-size: var(--kairos-font-size-3xl); }
+.text-4xl { font-size: var(--kairos-font-size-4xl); }
+.text-5xl { font-size: var(--kairos-font-size-5xl); }
+.text-6xl { font-size: var(--kairos-font-size-6xl); }
+
+.font-light { font-weight: var(--kairos-font-weight-light); }
+.font-normal { font-weight: var(--kairos-font-weight-normal); }
+.font-medium { font-weight: var(--kairos-font-weight-medium); }
+.font-semibold { font-weight: var(--kairos-font-weight-semibold); }
+.font-bold { font-weight: var(--kairos-font-weight-bold); }
+.font-extrabold { font-weight: var(--kairos-font-weight-extrabold); }
+
+.leading-tight { line-height: var(--kairos-line-height-tight); }
+.leading-normal { line-height: var(--kairos-line-height-normal); }
+.leading-relaxed { line-height: var(--kairos-line-height-relaxed); }
+.leading-loose { line-height: var(--kairos-line-height-loose); }
+
+/* =============================================================================
+   THEME SWITCHER SPECIFIC STYLES
+   ============================================================================= */
+
+.theme-switcher {
+  position: relative;
+  z-index: 50;
+}
+
+.theme-switcher-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 280px;
+  background-color: var(--kairos-color-gray-100);
+  border: 1px solid var(--kairos-color-gray-200);
+  border-radius: var(--kairos-border-radius-lg);
+  box-shadow: var(--kairos-shadow-lg);
+  overflow: hidden;
+  transform: translateY(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
+
+.dark .theme-switcher-dropdown {
+  background-color: var(--kairos-color-gray-800);
+  border-color: var(--kairos-color-gray-700);
+}
+
+.theme-switcher-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(4px);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: var(--kairos-color-gray-700);
+  font-size: var(--kairos-font-size-sm);
+  cursor: pointer;
+  transition: all var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
+
+.dark .theme-option {
+  color: var(--kairos-color-gray-300);
+}
+
+.theme-option:hover {
+  background-color: var(--kairos-color-gray-200);
+  color: var(--kairos-color-gray-900);
+}
+
+.dark .theme-option:hover {
+  background-color: var(--kairos-color-gray-700);
+  color: var(--kairos-color-gray-100);
+}
+
+.theme-option.active {
+  background-color: var(--kairos-color-primary-100);
+  color: var(--kairos-color-primary-700);
+}
+
+.dark .theme-option.active {
+  background-color: var(--kairos-color-primary-800);
+  color: var(--kairos-color-primary-200);
+}
+
+.theme-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--kairos-border-radius-sm);
+  border: 2px solid var(--kairos-color-gray-300);
+  margin-right: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.theme-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    var(--preview-primary, var(--kairos-color-primary-500)) 0%,
+    var(--preview-primary, var(--kairos-color-primary-500)) 50%,
+    var(--preview-secondary, var(--kairos-color-secondary-500)) 50%,
+    var(--preview-secondary, var(--kairos-color-secondary-500)) 100%
+  );
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN CLASSES
+   ============================================================================= */
+
+@media (max-width: 640px) {
+  .theme-switcher-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    min-width: 100%;
+    border-radius: var(--kairos-border-radius-lg) var(--kairos-border-radius-lg) 0 0;
+    transform: translateY(100%);
+  }
+
+  .theme-switcher-dropdown.open {
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
+   ANIMATION KEYFRAMES
+   ============================================================================= */
+
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes theme-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.theme-fade-in {
+  animation: theme-fade-in var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
+
+.theme-fade-out {
+  animation: theme-fade-out var(--kairos-transition-duration) var(--kairos-transition-timing);
+}
