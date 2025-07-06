@@ -1,5 +1,10 @@
 // File: kairos-frontend/tailwind.config.js
-// Tailwind CSS configuration for Kairos themes
+// Tailwind CSS configuration for Kairos themes - Fixed for ES modules
+
+import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
+import aspectRatio from '@tailwindcss/aspect-ratio';
+import containerQueries from '@tailwindcss/container-queries';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -145,18 +150,18 @@ export default {
   },
   plugins: [
     // Forms plugin for better form styling
-    require('@tailwindcss/forms')({
+    forms({
       strategy: 'class',
     }),
     
     // Typography plugin for rich text content
-    require('@tailwindcss/typography'),
+    typography,
     
     // Aspect ratio plugin
-    require('@tailwindcss/aspect-ratio'),
+    aspectRatio,
     
     // Container queries plugin
-    require('@tailwindcss/container-queries'),
+    containerQueries,
     
     // Custom plugin for Kairos-specific utilities
     function({ addUtilities, addComponents, theme }) {

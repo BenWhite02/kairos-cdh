@@ -1,42 +1,142 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* File: src/App.css */
+/* Global styles and theme initialization for Kairos */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Base theme variables (default theme) */
+:root {
+  --kairos-color-primary: #2563eb;
+  --kairos-color-primary-hover: #1d4ed8;
+  --kairos-color-primary-active: #1e40af;
+  --kairos-color-secondary: #64748b;
+  --kairos-color-accent: #f59e0b;
+  --kairos-color-background: #ffffff;
+  --kairos-color-background-secondary: #f8fafc;
+  --kairos-color-surface: #ffffff;
+  --kairos-color-surface-hover: #f1f5f9;
+  --kairos-color-text: #0f172a;
+  --kairos-color-text-secondary: #475569;
+  --kairos-color-text-muted: #94a3b8;
+  --kairos-color-border: #e2e8f0;
+  --kairos-color-border-light: #f1f5f9;
+  --kairos-color-success: #10b981;
+  --kairos-color-warning: #f59e0b;
+  --kairos-color-error: #ef4444;
+  --kairos-color-info: #3b82f6;
+  --kairos-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --kairos-font-family-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --kairos-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --kairos-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --kairos-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --kairos-border-radius-sm: 0.125rem;
+  --kairos-border-radius-md: 0.375rem;
+  --kairos-border-radius-lg: 0.5rem;
+  --kairos-animation-duration-fast: 150ms;
+  --kairos-animation-duration-normal: 250ms;
+  --kairos-animation-duration-slow: 350ms;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Dark theme overrides */
+.theme-dark {
+  --kairos-color-primary: #3b82f6;
+  --kairos-color-primary-hover: #2563eb;
+  --kairos-color-primary-active: #1d4ed8;
+  --kairos-color-background: #0f172a;
+  --kairos-color-background-secondary: #1e293b;
+  --kairos-color-surface: #1e293b;
+  --kairos-color-surface-hover: #334155;
+  --kairos-color-text: #f8fafc;
+  --kairos-color-text-secondary: #cbd5e1;
+  --kairos-color-text-muted: #64748b;
+  --kairos-color-border: #334155;
+  --kairos-color-border-light: #475569;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* High contrast theme overrides */
+.theme-high-contrast {
+  --kairos-color-primary: #0000ff;
+  --kairos-color-primary-hover: #0000cc;
+  --kairos-color-primary-active: #000099;
+  --kairos-color-background: #ffffff;
+  --kairos-color-background-secondary: #f0f0f0;
+  --kairos-color-surface: #ffffff;
+  --kairos-color-surface-hover: #e0e0e0;
+  --kairos-color-text: #000000;
+  --kairos-color-text-secondary: #333333;
+  --kairos-color-text-muted: #666666;
+  --kairos-color-border: #000000;
+  --kairos-color-border-light: #333333;
+  --kairos-color-success: #008000;
+  --kairos-color-warning: #ff8000;
+  --kairos-color-error: #ff0000;
+  --kairos-color-info: #0000ff;
+}
+
+/* Global styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--kairos-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--kairos-color-background);
+  color: var(--kairos-color-text);
+  transition: background-color var(--kairos-animation-duration-normal) ease-in-out,
+              color var(--kairos-animation-duration-normal) ease-in-out;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color var(--kairos-animation-duration-fast) ease-in-out,
+              border-color var(--kairos-animation-duration-fast) ease-in-out,
+              color var(--kairos-animation-duration-fast) ease-in-out;
+}
+
+/* Focus styles */
+*:focus {
+  outline: 2px solid var(--kairos-color-primary);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background-color: var(--kairos-color-primary);
+  color: white;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--kairos-color-background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--kairos-color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--kairos-color-text-muted);
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

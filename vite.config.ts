@@ -1,5 +1,5 @@
 // File: kairos-frontend/vite.config.ts
-// Vite configuration for Kairos frontend
+// Vite configuration for Kairos frontend - Fixed for ES modules
 
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -64,14 +64,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   
-  // CSS configuration
+  // CSS configuration - Remove postcss plugins from here
   css: {
-    postcss: {
-      plugins: [
-        require('tailwindcss'),
-        require('autoprefixer'),
-      ],
-    },
+    // PostCSS configuration should be in postcss.config.js instead
   },
   
   // Test configuration
