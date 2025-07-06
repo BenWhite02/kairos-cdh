@@ -39,3 +39,6 @@ coverage/
 
 # Storybook
 storybook-static/
+
+# Cleanup backups
+kairos-cleanup-backup-*/
