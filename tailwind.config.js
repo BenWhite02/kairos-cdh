@@ -1,265 +1,207 @@
-// File: kairos-frontend/tailwind.config.js
-// Tailwind CSS configuration for Kairos themes - Fixed for ES modules
+// File: tailwind.config.js
+// 🎨 KAIROS Tailwind CSS Configuration
+// Integrates with theme system for CSS-in-classes approach
 
-import forms from '@tailwindcss/forms';
-import typography from '@tailwindcss/typography';
-import aspectRatio from '@tailwindcss/aspect-ratio';
-import containerQueries from '@tailwindcss/container-queries';
+import { fontFamily } from 'tailwindcss/defaultTheme'
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx,md,mdx}',
+    './.storybook/**/*.{js,ts,jsx,tsx}'
   ],
-  darkMode: ['class', '[data-theme="dark"]'],
+  darkMode: 'class',
   theme: {
     extend: {
-      // Colors using CSS custom properties for theme switching
+      // Color system using CSS variables
       colors: {
+        // Primary colors
         primary: {
-          DEFAULT: 'var(--kairos-color-primary)',
-          hover: 'var(--kairos-color-primary-hover)',
-          active: 'var(--kairos-color-primary-active)',
+          50: 'var(--kairos-color-primary-50)',
+          100: 'var(--kairos-color-primary-100)',
+          200: 'var(--kairos-color-primary-200)',
+          300: 'var(--kairos-color-primary-300)',
+          400: 'var(--kairos-color-primary-400)',
+          500: 'var(--kairos-color-primary-500)',
+          600: 'var(--kairos-color-primary-600)',
+          700: 'var(--kairos-color-primary-700)',
+          800: 'var(--kairos-color-primary-800)',
+          900: 'var(--kairos-color-primary-900)',
+          DEFAULT: 'var(--kairos-color-primary-500)'
         },
-        secondary: 'var(--kairos-color-secondary)',
-        accent: 'var(--kairos-color-accent)',
-        background: {
-          DEFAULT: 'var(--kairos-color-background)',
-          secondary: 'var(--kairos-color-background-secondary)',
+        
+        // Secondary colors
+        secondary: {
+          50: 'var(--kairos-color-secondary-50)',
+          100: 'var(--kairos-color-secondary-100)',
+          200: 'var(--kairos-color-secondary-200)',
+          300: 'var(--kairos-color-secondary-300)',
+          400: 'var(--kairos-color-secondary-400)',
+          500: 'var(--kairos-color-secondary-500)',
+          600: 'var(--kairos-color-secondary-600)',
+          700: 'var(--kairos-color-secondary-700)',
+          800: 'var(--kairos-color-secondary-800)',
+          900: 'var(--kairos-color-secondary-900)',
+          DEFAULT: 'var(--kairos-color-secondary-500)'
         },
-        surface: {
-          DEFAULT: 'var(--kairos-color-surface)',
-          hover: 'var(--kairos-color-surface-hover)',
+        
+        // Accent colors
+        accent: {
+          50: 'var(--kairos-color-accent-50)',
+          100: 'var(--kairos-color-accent-100)',
+          200: 'var(--kairos-color-accent-200)',
+          300: 'var(--kairos-color-accent-300)',
+          400: 'var(--kairos-color-accent-400)',
+          500: 'var(--kairos-color-accent-500)',
+          600: 'var(--kairos-color-accent-600)',
+          700: 'var(--kairos-color-accent-700)',
+          800: 'var(--kairos-color-accent-800)',
+          900: 'var(--kairos-color-accent-900)',
+          DEFAULT: 'var(--kairos-color-accent-500)'
         },
-        text: {
-          DEFAULT: 'var(--kairos-color-text)',
-          secondary: 'var(--kairos-color-text-secondary)',
-          muted: 'var(--kairos-color-text-muted)',
-        },
-        border: {
-          DEFAULT: 'var(--kairos-color-border)',
-          light: 'var(--kairos-color-border-light)',
-        },
+        
+        // Semantic colors
         success: 'var(--kairos-color-success)',
         warning: 'var(--kairos-color-warning)',
         error: 'var(--kairos-color-error)',
         info: 'var(--kairos-color-info)',
+        
+        // Background colors
+        background: 'var(--kairos-color-background)',
+        surface: 'var(--kairos-color-surface)',
+        'surface-elevated': 'var(--kairos-color-surface-elevated)',
+        
+        // Text colors
+        'text-primary': 'var(--kairos-color-text-primary)',
+        'text-secondary': 'var(--kairos-color-text-secondary)',
+        'text-tertiary': 'var(--kairos-color-text-tertiary)',
+        'text-inverse': 'var(--kairos-color-text-inverse)',
+        
+        // Border colors
+        border: {
+          DEFAULT: 'var(--kairos-color-border)',
+          subtle: 'var(--kairos-color-border-subtle)',
+          strong: 'var(--kairos-color-border-strong)'
+        }
       },
       
-      // Typography using CSS custom properties
+      // Typography using CSS variables
       fontFamily: {
-        sans: ['var(--kairos-font-family)', 'system-ui', 'sans-serif'],
-        mono: ['var(--kairos-font-family-mono)', 'monospace'],
+        sans: ['var(--kairos-font-family-sans)', ...fontFamily.sans],
+        mono: ['var(--kairos-font-family-mono)', ...fontFamily.mono]
       },
       
-      // Shadows using CSS custom properties
-      boxShadow: {
-        sm: 'var(--kairos-shadow-sm)',
-        DEFAULT: 'var(--kairos-shadow-md)',
-        md: 'var(--kairos-shadow-md)',
-        lg: 'var(--kairos-shadow-lg)',
-        xl: 'var(--kairos-shadow-xl)',
+      fontSize: {
+        xs: 'var(--kairos-font-size-xs)',
+        sm: 'var(--kairos-font-size-sm)',
+        base: 'var(--kairos-font-size-base)',
+        lg: 'var(--kairos-font-size-lg)',
+        xl: 'var(--kairos-font-size-xl)',
+        '2xl': 'var(--kairos-font-size-2xl)',
+        '3xl': 'var(--kairos-font-size-3xl)',
+        '4xl': 'var(--kairos-font-size-4xl)'
       },
       
-      // Border radius using CSS custom properties
+      lineHeight: {
+        tight: 'var(--kairos-line-height-tight)',
+        normal: 'var(--kairos-line-height-normal)',
+        relaxed: 'var(--kairos-line-height-relaxed)'
+      },
+      
+      // Spacing using CSS variables
+      spacing: {
+        xs: 'var(--kairos-spacing-xs)',
+        sm: 'var(--kairos-spacing-sm)',
+        md: 'var(--kairos-spacing-md)',
+        lg: 'var(--kairos-spacing-lg)',
+        xl: 'var(--kairos-spacing-xl)',
+        '2xl': 'var(--kairos-spacing-2xl)'
+      },
+      
+      // Border radius using CSS variables
       borderRadius: {
         sm: 'var(--kairos-border-radius-sm)',
         DEFAULT: 'var(--kairos-border-radius-md)',
         md: 'var(--kairos-border-radius-md)',
         lg: 'var(--kairos-border-radius-lg)',
+        xl: 'var(--kairos-border-radius-xl)',
+        '2xl': 'var(--kairos-border-radius-2xl)',
+        full: 'var(--kairos-border-radius-full)'
       },
       
-      // Animation durations using CSS custom properties
+      // Box shadows using CSS variables
+      boxShadow: {
+        sm: 'var(--kairos-shadow-sm)',
+        DEFAULT: 'var(--kairos-shadow-md)',
+        md: 'var(--kairos-shadow-md)',
+        lg: 'var(--kairos-shadow-lg)',
+        xl: 'var(--kairos-shadow-xl)'
+      },
+      
+      // Animation and transitions
       transitionDuration: {
-        fast: 'var(--kairos-animation-duration-fast)',
-        normal: 'var(--kairos-animation-duration-normal)',
-        slow: 'var(--kairos-animation-duration-slow)',
+        theme: '200ms'
       },
       
-      // Custom spacing scale
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
+      transitionTimingFunction: {
+        theme: 'cubic-bezier(0.4, 0, 0.2, 1)'
       },
       
-      // Custom breakpoints for perfect moment delivery
-      screens: {
-        'xs': '475px',
-        '3xl': '1920px',
-      },
-      
-      // Animation utilities
+      // Custom animations
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'pulse-soft': 'pulseSoft 2s infinite',
-        'float': 'float 3s ease-in-out infinite',
+        'fade-in': 'fadeIn 150ms ease-out',
+        'fade-out': 'fadeOut 150ms ease-in',
+        'slide-in': 'slideIn 200ms ease-out',
+        'slide-out': 'slideOut 200ms ease-in',
+        'scale-in': 'scaleIn 200ms ease-out',
+        'scale-out': 'scaleOut 200ms ease-in',
+        'spin-slow': 'spin 3s linear infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite'
       },
       
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          '100%': { opacity: '1' }
         },
-        slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        fadeOut: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' }
         },
-        slideDown: {
+        slideIn: {
           '0%': { transform: 'translateY(-10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+          '100%': { transform: 'translateY(0)', opacity: '1' }
+        },
+        slideOut: {
+          '0%': { transform: 'translateY(0)', opacity: '1' },
+          '100%': { transform: 'translateY(-10px)', opacity: '0' }
         },
         scaleIn: {
-          '0%': { transform: 'scale(0.9)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' }
         },
-        pulseSoft: {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.7' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-5px)' },
-        },
+        scaleOut: {
+          '0%': { transform: 'scale(1)', opacity: '1' },
+          '100%': { transform: 'scale(0.95)', opacity: '0' }
+        }
       },
       
-      // Grid templates for complex layouts
-      gridTemplateColumns: {
-        'auto-fit-250': 'repeat(auto-fit, minmax(250px, 1fr))',
-        'auto-fit-300': 'repeat(auto-fit, minmax(300px, 1fr))',
-        'auto-fill-250': 'repeat(auto-fill, minmax(250px, 1fr))',
-      },
-      
-      // Backdrop blur utilities
-      backdropBlur: {
-        xs: '2px',
-      },
-      
-      // Custom aspect ratios
-      aspectRatio: {
-        '4/3': '4 / 3',
-        '3/2': '3 / 2',
-        '2/3': '2 / 3',
-        '9/16': '9 / 16',
-      },
-    },
+      // Breakpoints for responsive design
+      screens: {
+        xs: '475px',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px'
+      }
+    }
   },
   plugins: [
-    // Forms plugin for better form styling
-    forms({
-      strategy: 'class',
-    }),
-    
-    // Typography plugin for rich text content
-    typography,
-    
-    // Aspect ratio plugin
-    aspectRatio,
-    
-    // Container queries plugin
-    containerQueries,
-    
-    // Custom plugin for Kairos-specific utilities
-    function({ addUtilities, addComponents, theme }) {
-      // Custom utilities
-      addUtilities({
-        '.text-balance': {
-          'text-wrap': 'balance',
-        },
-        '.text-pretty': {
-          'text-wrap': 'pretty',
-        },
-        '.scrollbar-hide': {
-          '-ms-overflow-style': 'none',
-          'scrollbar-width': 'none',
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
-        },
-        '.scrollbar-thin': {
-          'scrollbar-width': 'thin',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-            height: '6px',
-          },
-          '&::-webkit-scrollbar-track': {
-            'background-color': 'var(--kairos-color-background-secondary)',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            'background-color': 'var(--kairos-color-border)',
-            'border-radius': '3px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            'background-color': 'var(--kairos-color-text-muted)',
-          },
-        },
-      });
-      
-      // Custom components
-      addComponents({
-        '.kairos-card': {
-          'background-color': 'var(--kairos-color-surface)',
-          'border': '1px solid var(--kairos-color-border)',
-          'border-radius': 'var(--kairos-border-radius-md)',
-          'box-shadow': 'var(--kairos-shadow-sm)',
-          'transition': 'all var(--kairos-animation-duration-fast) ease-in-out',
-          '&:hover': {
-            'background-color': 'var(--kairos-color-surface-hover)',
-            'box-shadow': 'var(--kairos-shadow-md)',
-          },
-        },
-        '.kairos-button': {
-          'background-color': 'var(--kairos-color-primary)',
-          'color': 'white',
-          'border-radius': 'var(--kairos-border-radius-md)',
-          'padding': '0.5rem 1rem',
-          'font-weight': '500',
-          'transition': 'all var(--kairos-animation-duration-fast) ease-in-out',
-          '&:hover': {
-            'background-color': 'var(--kairos-color-primary-hover)',
-            'transform': 'translateY(-1px)',
-          },
-          '&:active': {
-            'background-color': 'var(--kairos-color-primary-active)',
-            'transform': 'translateY(0)',
-          },
-          '&:disabled': {
-            'opacity': '0.5',
-            'cursor': 'not-allowed',
-            'transform': 'none',
-          },
-        },
-        '.kairos-input': {
-          'background-color': 'var(--kairos-color-background)',
-          'border': '1px solid var(--kairos-color-border)',
-          'border-radius': 'var(--kairos-border-radius-md)',
-          'padding': '0.5rem 0.75rem',
-          'color': 'var(--kairos-color-text)',
-          'transition': 'all var(--kairos-animation-duration-fast) ease-in-out',
-          '&:focus': {
-            'outline': 'none',
-            'border-color': 'var(--kairos-color-primary)',
-            'box-shadow': '0 0 0 3px rgb(from var(--kairos-color-primary) r g b / 0.1)',
-          },
-          '&::placeholder': {
-            'color': 'var(--kairos-color-text-muted)',
-          },
-        },
-        '.kairos-badge': {
-          'background-color': 'var(--kairos-color-primary)',
-          'color': 'white',
-          'border-radius': 'var(--kairos-border-radius-lg)',
-          'padding': '0.25rem 0.5rem',
-          'font-size': '0.75rem',
-          'font-weight': '500',
-          'text-transform': 'uppercase',
-          'letter-spacing': '0.025em',
-        },
-      });
-    },
-  ],
-};
+    // Add any additional Tailwind plugins here
+    // require('@tailwindcss/forms'),
+    // require('@tailwindcss/typography'),
+    // require('@tailwindcss/aspect-ratio'),
+  ]
+}

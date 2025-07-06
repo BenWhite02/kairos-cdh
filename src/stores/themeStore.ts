@@ -1,691 +1,593 @@
 // File: src/stores/themeStore.ts
-// 🎨 Enhanced Theme State Management for Kairos Frontend
-// Manages theme switching, custom themes, and tenant-specific theming
-// Integrates with CSS Variable Manager for dynamic theme application
+// 🎨 KAIROS Theme Store with Zustand
+// Global state management for theme system
+// All styles kept in classes as per project requirements
 
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { subscribeWithSelector } from 'zustand/middleware'
-import { persist } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
-import { ThemeDefinition, themeConfig, getTheme, getAllThemes, isDarkTheme } from '@/config/theme.config'
-import { CSSVariableManager } from '@/utils/cssVariableManager'
-import { environmentConfig } from '@/config/environment.config'
+import { 
+  Theme, 
+  ThemeState, 
+  ThemeActions, 
+  CustomThemeColors,
+  ThemePreset 
+} from '@/types/theme.types'
+import { 
+  getAllThemes, 
+  getTheme, 
+  getCustomThemes, 
+  saveCustomThemes,
+  createThemeFromPreset,
+  THEME_STORAGE_KEY,
+  THEME_TRANSITION_DURATION,
+  getDefaultThemeId
+} from '@/config/theme.config'
+import { CSSVariableManager } from '@/utils/theme/cssVariableManager'
+import { ThemeValidator } from '@/utils/theme/themeValidator'
 
-export interface CustomThemeColors {
-  primary?: string
-  secondary?: string
-  accent?: string
-  background?: string
-  foreground?: string
-  muted?: string
-  border?: string
-}
+// =============================================================================
+// THEME STORE INTERFACE
+// =============================================================================
 
-export interface ThemePreset {
-  id: string
-  name: string
-  description: string
-  colors: CustomThemeColors
-  preview?: string
-}
+interface ThemeStore extends ThemeState, ThemeActions {}
 
-export interface ThemeState {
-  // Current theme state
-  currentTheme: string
-  isDarkMode: boolean
-  isSystemTheme: boolean
+// =============================================================================
+// INITIAL STATE
+// =============================================================================
+
+const initialState: ThemeState = {
+  // Current theme
+  currentTheme: getDefaultThemeId(),
   
   // Theme management
-  availableThemes: ThemeDefinition[]
-  customThemes: ThemeDefinition[]
-  themePresets: ThemePreset[]
-  
-  // Tenant theming
-  tenantTheme?: ThemeDefinition
-  enableTenantTheming: boolean
-  
-  // Theme creator
-  isThemeCreatorOpen: boolean
-  editingTheme?: ThemeDefinition
-  previewTheme?: ThemeDefinition
+  availableThemes: getAllThemes(),
+  customThemes: getCustomThemes(),
   
   // UI state
-  isTransitioning: boolean
-  themeLoadingStates: Record<string, boolean>
-  lastThemeChange: number
+  isTransitioning: false,
+  isCreatorOpen: false,
+  previewTheme: null,
   
-  // Customization
-  customColors: CustomThemeColors
-  enableCustomColors: boolean
+  // System preferences
+  systemThemePreference: 'light',
+  respectSystemTheme: true,
+  
+  // Custom theme creation
+  enableCustomColors: import.meta.env.VITE_CUSTOM_THEMES_ENABLED === 'true',
+  
+  // Settings
+  transitionDuration: THEME_TRANSITION_DURATION,
+  preloadThemes: true,
+  persistCustomThemes: true,
   
   // Cache
-  themeCacheTimestamp: number
-  enableThemeCache: boolean
-}
-
-export interface ThemeActions {
-  // Theme switching
-  setTheme: (themeId: string) => void
-  toggleDarkMode: () => void
-  applySystemTheme: () => void
+  themeCache: new Map(),
   
-  // Custom themes
-  createCustomTheme: (theme: Partial<ThemeDefinition>) => Promise<void>
-  updateCustomTheme: (themeId: string, updates: Partial<ThemeDefinition>) => Promise<void>
-  deleteCustomTheme: (themeId: string) => Promise<void>
-  duplicateTheme: (themeId: string, newName: string) => Promise<void>
-  
-  // Theme creator
-  openThemeCreator: (themeId?: string) => void
-  closeThemeCreator: () => void
-  setEditingTheme: (theme: ThemeDefinition) => void
-  setPreviewTheme: (theme?: ThemeDefinition) => void
-  saveEditingTheme: () => Promise<void>
-  resetEditingTheme: () => void
-  
-  // Custom colors
-  setCustomColors: (colors: CustomThemeColors) => void
-  toggleCustomColors: () => void
-  resetCustomColors: () => void
-  
-  // Tenant theming
-  setTenantTheme: (theme?: ThemeDefinition) => void
-  toggleTenantTheming: () => void
-  loadTenantTheme: (tenantId: string) => Promise<void>
-  saveTenantTheme: (tenantId: string, theme: ThemeDefinition) => Promise<void>
-  
-  // Presets
-  loadThemePresets: () => Promise<void>
-  createThemePreset: (preset: ThemePreset) => void
-  applyThemePreset: (presetId: string) => void
-  
-  // Cache management
-  refreshThemeCache: () => Promise<void>
-  clearThemeCache: () => void
-  
-  // Utilities
-  exportTheme: (themeId: string) => string
-  importTheme: (themeData: string) => Promise<void>
-  getThemeCSS: (themeId: string) => string
-  initializeTheme: () => void
-}
-
-type ThemeStore = ThemeState & ThemeActions
-
-// =============================================================================
-// CSS VARIABLE MANAGER INSTANCE
-// =============================================================================
-
-const cssManager = new CSSVariableManager(environmentConfig.theme.cssVariablePrefix || '--kairos')
-
-// =============================================================================
-// SYSTEM THEME DETECTION
-// =============================================================================
-
-const getSystemTheme = (): boolean => {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
+  // Error state
+  error: null
 }
 
 // =============================================================================
-// THEME STORE
+// THEME STORE IMPLEMENTATION
 // =============================================================================
 
 export const useThemeStore = create<ThemeStore>()(
   subscribeWithSelector(
     persist(
-      immer((set, get) => ({
-        // =============================================================================
-        // INITIAL STATE
-        // =============================================================================
-        currentTheme: themeConfig.defaultTheme,
-        isDarkMode: false,
-        isSystemTheme: themeConfig.defaultTheme === 'system',
-        
-        availableThemes: getAllThemes(),
-        customThemes: [],
-        themePresets: [],
-        
-        tenantTheme: undefined,
-        enableTenantTheming: environmentConfig.theme.enableTenantThemes,
-        
-        isThemeCreatorOpen: false,
-        editingTheme: undefined,
-        previewTheme: undefined,
-        
-        isTransitioning: false,
-        themeLoadingStates: {},
-        lastThemeChange: 0,
-        
-        customColors: {},
-        enableCustomColors: false,
-        
-        themeCacheTimestamp: 0,
-        enableThemeCache: true,
+      (set, get) => ({
+        ...initialState,
 
-        // =============================================================================
-        // THEME SWITCHING ACTIONS
-        // =============================================================================
-        setTheme: (themeId: string) => {
-          set((state) => {
-            state.isTransitioning = true
-            state.currentTheme = themeId
-            state.isSystemTheme = themeId === 'system'
-            state.lastThemeChange = Date.now()
+        // =======================================================================
+        // CORE THEME ACTIONS
+        // =======================================================================
+
+        /**
+         * Set the current theme
+         */
+        setTheme: async (themeId: string) => {
+          const { isTransitioning, currentTheme } = get()
+          
+          // Prevent multiple simultaneous transitions
+          if (isTransitioning || currentTheme === themeId) return
+          
+          try {
+            set({ isTransitioning: true, error: null })
             
-            if (themeId === 'system') {
-              state.isDarkMode = getSystemTheme()
-            } else {
-              state.isDarkMode = isDarkTheme(themeId)
+            // Get theme data
+            const theme = getTheme(themeId)
+            if (!theme) {
+              throw new Error(`Theme '${themeId}' not found`)
             }
-          })
-
-          // Apply theme after state update
-          setTimeout(() => {
-            const theme = get().tenantTheme || getTheme(themeId)
-            if (theme) {
-              cssManager.applyTheme(theme)
-              
-              // Apply custom colors if enabled
-              if (get().enableCustomColors) {
-                cssManager.applyCustomColors(get().customColors)
-              }
+            
+            // Handle system theme
+            let resolvedTheme = theme
+            if (theme.type === 'system') {
+              const systemPreference = get().systemThemePreference
+              const fallbackThemeId = systemPreference === 'dark' ? 'dark' : 'light'
+              resolvedTheme = getTheme(fallbackThemeId) || theme
             }
-
-            set((state) => {
-              state.isTransitioning = false
+            
+            // Apply theme variables to CSS
+            await CSSVariableManager.applyTheme(resolvedTheme)
+            
+            // Add transition class to body
+            document.body.classList.add('theme-transitioning')
+            
+            // Update store state
+            set({ 
+              currentTheme: themeId,
+              previewTheme: null
             })
-          }, 0)
+            
+            // Remove transition class after animation
+            setTimeout(() => {
+              document.body.classList.remove('theme-transitioning')
+              set({ isTransitioning: false })
+            }, get().transitionDuration)
+            
+          } catch (error) {
+            console.error('Theme application failed:', error)
+            set({ 
+              error: error instanceof Error ? error.message : 'Theme application failed',
+              isTransitioning: false 
+            })
+          }
         },
 
-        toggleDarkMode: () => {
-          const state = get()
-          const newTheme = state.isDarkMode ? 'light' : 'dark'
+        /**
+         * Preview a theme without applying it
+         */
+        previewTheme: async (themeId: string | null) => {
+          const { currentTheme } = get()
+          
+          try {
+            set({ error: null })
+            
+            if (themeId === null) {
+              // Reset to current theme
+              const theme = getTheme(currentTheme)
+              if (theme) {
+                await CSSVariableManager.applyTheme(theme)
+              }
+              set({ previewTheme: null })
+              return
+            }
+            
+            const theme = getTheme(themeId)
+            if (!theme) {
+              throw new Error(`Theme '${themeId}' not found`)
+            }
+            
+            // Handle system theme for preview
+            let resolvedTheme = theme
+            if (theme.type === 'system') {
+              const systemPreference = get().systemThemePreference
+              const fallbackThemeId = systemPreference === 'dark' ? 'dark' : 'light'
+              resolvedTheme = getTheme(fallbackThemeId) || theme
+            }
+            
+            await CSSVariableManager.applyTheme(resolvedTheme)
+            set({ previewTheme: themeId })
+            
+          } catch (error) {
+            console.error('Theme preview failed:', error)
+            set({ error: error instanceof Error ? error.message : 'Theme preview failed' })
+          }
+        },
+
+        /**
+         * Toggle between light and dark theme
+         */
+        toggleTheme: () => {
+          const { currentTheme } = get()
+          const newTheme = currentTheme === 'light' ? 'dark' : 'light'
           get().setTheme(newTheme)
         },
 
-        applySystemTheme: () => {
-          get().setTheme('system')
-        },
+        // =======================================================================
+        // CUSTOM THEME MANAGEMENT
+        // =======================================================================
 
-        // =============================================================================
-        // CUSTOM THEME ACTIONS
-        // =============================================================================
-        createCustomTheme: async (themeData: Partial<ThemeDefinition>) => {
-          const id = `custom-${Date.now()}`
-          const newTheme: ThemeDefinition = {
-            id,
-            name: themeData.name || 'Custom Theme',
-            description: themeData.description || 'Custom theme created by user',
-            colors: themeData.colors || getTheme('light')!.colors,
-            typography: themeData.typography || getTheme('light')!.typography,
-            spacing: themeData.spacing || getTheme('light')!.spacing,
-            isDark: themeData.isDark || false,
-            isCustom: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-
-          set((state) => {
-            state.customThemes.push(newTheme)
-            state.availableThemes.push(newTheme)
-          })
-
-          // Save to backend if tenant theming is enabled
-          if (get().enableTenantTheming) {
-            try {
-              await fetch(`${environmentConfig.theme.apiUrl}/custom`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newTheme)
-              })
-            } catch (error) {
-              console.error('Failed to save custom theme:', error)
-            }
-          }
-        },
-
-        updateCustomTheme: async (themeId: string, updates: Partial<ThemeDefinition>) => {
-          set((state) => {
-            const customIndex = state.customThemes.findIndex(t => t.id === themeId)
-            const availableIndex = state.availableThemes.findIndex(t => t.id === themeId)
-            
-            if (customIndex !== -1) {
-              Object.assign(state.customThemes[customIndex], {
-                ...updates,
-                updatedAt: new Date().toISOString()
-              })
-            }
-            
-            if (availableIndex !== -1) {
-              Object.assign(state.availableThemes[availableIndex], {
-                ...updates,
-                updatedAt: new Date().toISOString()
-              })
-            }
-          })
-
-          // Save to backend
-          if (get().enableTenantTheming) {
-            try {
-              await fetch(`${environmentConfig.theme.apiUrl}/custom/${themeId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates)
-              })
-            } catch (error) {
-              console.error('Failed to update custom theme:', error)
-            }
-          }
-        },
-
-        deleteCustomTheme: async (themeId: string) => {
-          set((state) => {
-            state.customThemes = state.customThemes.filter(t => t.id !== themeId)
-            state.availableThemes = state.availableThemes.filter(t => t.id !== themeId)
-            
-            // Switch to default theme if deleted theme was active
-            if (state.currentTheme === themeId) {
-              state.currentTheme = themeConfig.defaultTheme
-            }
-          })
-
-          // Delete from backend
-          if (get().enableTenantTheming) {
-            try {
-              await fetch(`${environmentConfig.theme.apiUrl}/custom/${themeId}`, {
-                method: 'DELETE'
-              })
-            } catch (error) {
-              console.error('Failed to delete custom theme:', error)
-            }
-          }
-        },
-
-        duplicateTheme: async (themeId: string, newName: string) => {
-          const originalTheme = getTheme(themeId) || get().customThemes.find(t => t.id === themeId)
-          if (!originalTheme) return
-
-          await get().createCustomTheme({
-            ...originalTheme,
-            name: newName,
-            description: `Copy of ${originalTheme.name}`
-          })
-        },
-
-        // =============================================================================
-        // THEME CREATOR ACTIONS
-        // =============================================================================
-        openThemeCreator: (themeId?: string) => {
-          set((state) => {
-            state.isThemeCreatorOpen = true
-            if (themeId) {
-              const theme = getTheme(themeId) || state.customThemes.find(t => t.id === themeId)
-              if (theme) {
-                state.editingTheme = { ...theme }
-              }
-            } else {
-              state.editingTheme = { ...getTheme('light')!, id: 'new', name: 'New Theme', isCustom: true }
-            }
-          })
-        },
-
-        closeThemeCreator: () => {
-          set((state) => {
-            state.isThemeCreatorOpen = false
-            state.editingTheme = undefined
-            state.previewTheme = undefined
-          })
-        },
-
-        setEditingTheme: (theme: ThemeDefinition) => {
-          set((state) => {
-            state.editingTheme = { ...theme }
-          })
-        },
-
-        setPreviewTheme: (theme?: ThemeDefinition) => {
-          set((state) => {
-            state.previewTheme = theme
-          })
-
-          // Apply preview theme
-          if (theme) {
-            cssManager.applyTheme(theme)
-          } else {
-            // Revert to current theme
-            const currentTheme = get().tenantTheme || getTheme(get().currentTheme)
-            if (currentTheme) {
-              cssManager.applyTheme(currentTheme)
-            }
-          }
-        },
-
-        saveEditingTheme: async () => {
-          const editingTheme = get().editingTheme
-          if (!editingTheme) return
-
-          if (editingTheme.id === 'new') {
-            await get().createCustomTheme(editingTheme)
-          } else {
-            await get().updateCustomTheme(editingTheme.id, editingTheme)
-          }
-
-          get().closeThemeCreator()
-        },
-
-        resetEditingTheme: () => {
-          const editingTheme = get().editingTheme
-          if (!editingTheme) return
-
-          if (editingTheme.id === 'new') {
-            get().setEditingTheme({ ...getTheme('light')!, id: 'new', name: 'New Theme', isCustom: true })
-          } else {
-            const originalTheme = getTheme(editingTheme.id) || get().customThemes.find(t => t.id === editingTheme.id)
-            if (originalTheme) {
-              get().setEditingTheme(originalTheme)
-            }
-          }
-        },
-
-        // =============================================================================
-        // CUSTOM COLORS ACTIONS
-        // =============================================================================
-        setCustomColors: (colors: CustomThemeColors) => {
-          set((state) => {
-            state.customColors = { ...state.customColors, ...colors }
-          })
-
-          if (get().enableCustomColors) {
-            cssManager.applyCustomColors(colors)
-          }
-        },
-
-        toggleCustomColors: () => {
-          set((state) => {
-            state.enableCustomColors = !state.enableCustomColors
-          })
-
-          if (get().enableCustomColors) {
-            cssManager.applyCustomColors(get().customColors)
-          } else {
-            // Reapply current theme to remove custom colors
-            const currentTheme = get().tenantTheme || getTheme(get().currentTheme)
-            if (currentTheme) {
-              cssManager.applyTheme(currentTheme)
-            }
-          }
-        },
-
-        resetCustomColors: () => {
-          set((state) => {
-            state.customColors = {}
-            state.enableCustomColors = false
-          })
-
-          // Reapply current theme
-          const currentTheme = get().tenantTheme || getTheme(get().currentTheme)
-          if (currentTheme) {
-            cssManager.applyTheme(currentTheme)
-          }
-        },
-
-        // =============================================================================
-        // TENANT THEMING ACTIONS
-        // =============================================================================
-        setTenantTheme: (theme?: ThemeDefinition) => {
-          set((state) => {
-            state.tenantTheme = theme
-          })
-
-          // Apply tenant theme if set, otherwise apply current theme
-          const themeToApply = theme || getTheme(get().currentTheme)
-          if (themeToApply) {
-            cssManager.applyTheme(themeToApply)
-          }
-        },
-
-        toggleTenantTheming: () => {
-          set((state) => {
-            state.enableTenantTheming = !state.enableTenantTheming
-          })
-        },
-
-        loadTenantTheme: async (tenantId: string) => {
-          if (!get().enableTenantTheming) return
-
+        /**
+         * Create a new custom theme
+         */
+        createCustomTheme: (theme: Omit<Theme, 'isCustom'>) => {
           try {
-            const response = await fetch(`${environmentConfig.theme.apiUrl}/tenant/${tenantId}`)
-            if (response.ok) {
-              const tenantTheme = await response.json()
-              get().setTenantTheme(tenantTheme)
+            const errors = ThemeValidator.validateTheme(theme)
+            if (errors.length > 0) {
+              throw new Error(`Theme validation failed: ${errors.join(', ')}`)
             }
-          } catch (error) {
-            console.error('Failed to load tenant theme:', error)
-          }
-        },
-
-        saveTenantTheme: async (tenantId: string, theme: ThemeDefinition) => {
-          if (!get().enableTenantTheming) return
-
-          try {
-            await fetch(`${environmentConfig.theme.apiUrl}/tenant/${tenantId}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(theme)
+            
+            const customTheme: Theme = {
+              ...theme,
+              isCustom: true,
+              id: theme.id || `custom-${Date.now()}`
+            }
+            
+            const { customThemes } = get()
+            const updatedCustomThemes = [...customThemes, customTheme]
+            
+            // Save to localStorage
+            saveCustomThemes(updatedCustomThemes)
+            
+            // Update store
+            set({
+              customThemes: updatedCustomThemes,
+              availableThemes: getAllThemes(),
+              error: null
             })
-            get().setTenantTheme(theme)
+            
+            return customTheme.id
           } catch (error) {
-            console.error('Failed to save tenant theme:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create custom theme'
+            set({ error: errorMessage })
+            throw error
           }
         },
 
-        // =============================================================================
-        // PRESET ACTIONS
-        // =============================================================================
-        loadThemePresets: async () => {
+        /**
+         * Update an existing custom theme
+         */
+        updateCustomTheme: (themeId: string, updates: Partial<Theme>) => {
           try {
-            const response = await fetch(`${environmentConfig.theme.apiUrl}/presets`)
-            if (response.ok) {
-              const presets = await response.json()
-              set((state) => {
-                state.themePresets = presets
-              })
+            const { customThemes } = get()
+            const themeIndex = customThemes.findIndex(t => t.id === themeId)
+            
+            if (themeIndex === -1) {
+              throw new Error(`Custom theme '${themeId}' not found`)
             }
-          } catch (error) {
-            console.error('Failed to load theme presets:', error)
-          }
-        },
-
-        createThemePreset: (preset: ThemePreset) => {
-          set((state) => {
-            state.themePresets.push(preset)
-          })
-        },
-
-        applyThemePreset: (presetId: string) => {
-          const preset = get().themePresets.find(p => p.id === presetId)
-          if (preset) {
-            get().setCustomColors(preset.colors)
-            get().toggleCustomColors()
-          }
-        },
-
-        // =============================================================================
-        // CACHE MANAGEMENT
-        // =============================================================================
-        refreshThemeCache: async () => {
-          try {
-            const response = await fetch(`${environmentConfig.theme.apiUrl}/cache/refresh`, {
-              method: 'POST'
+            
+            const updatedTheme = { ...customThemes[themeIndex], ...updates }
+            const errors = ThemeValidator.validateTheme(updatedTheme)
+            if (errors.length > 0) {
+              throw new Error(`Theme validation failed: ${errors.join(', ')}`)
+            }
+            
+            const updatedCustomThemes = [...customThemes]
+            updatedCustomThemes[themeIndex] = updatedTheme
+            
+            // Save to localStorage
+            saveCustomThemes(updatedCustomThemes)
+            
+            // Update store
+            set({
+              customThemes: updatedCustomThemes,
+              availableThemes: getAllThemes(),
+              error: null
             })
-            if (response.ok) {
-              set((state) => {
-                state.themeCacheTimestamp = Date.now()
-              })
+            
+            // If this is the current theme, reapply it
+            if (get().currentTheme === themeId) {
+              get().setTheme(themeId)
             }
+            
           } catch (error) {
-            console.error('Failed to refresh theme cache:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update custom theme'
+            set({ error: errorMessage })
+            throw error
           }
         },
 
-        clearThemeCache: () => {
-          set((state) => {
-            state.themeCacheTimestamp = 0
-            state.customThemes = []
-            state.themePresets = []
-          })
-        },
-
-        // =============================================================================
-        // UTILITY ACTIONS
-        // =============================================================================
-        exportTheme: (themeId: string) => {
-          const theme = getTheme(themeId) || get().customThemes.find(t => t.id === themeId)
-          if (!theme) return ''
-
-          return JSON.stringify({
-            version: '1.0',
-            theme,
-            exportedAt: new Date().toISOString(),
-            exportedBy: 'Kairos Theme System'
-          }, null, 2)
-        },
-
-        importTheme: async (themeData: string) => {
+        /**
+         * Delete a custom theme
+         */
+        deleteCustomTheme: (themeId: string) => {
           try {
-            const parsed = JSON.parse(themeData)
-            if (parsed.theme && parsed.version) {
-              await get().createCustomTheme({
-                ...parsed.theme,
-                id: `imported-${Date.now()}`,
-                name: `${parsed.theme.name} (Imported)`
-              })
+            const { customThemes, currentTheme } = get()
+            const updatedCustomThemes = customThemes.filter(t => t.id !== themeId)
+            
+            // Save to localStorage
+            saveCustomThemes(updatedCustomThemes)
+            
+            // Update store
+            set({
+              customThemes: updatedCustomThemes,
+              availableThemes: getAllThemes(),
+              error: null
+            })
+            
+            // If the deleted theme was current, switch to default
+            if (currentTheme === themeId) {
+              get().setTheme(getDefaultThemeId())
             }
+            
           } catch (error) {
-            console.error('Failed to import theme:', error)
-            throw new Error('Invalid theme data')
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete custom theme'
+            set({ error: errorMessage })
+            throw error
           }
         },
 
-        getThemeCSS: (themeId: string) => {
-          const theme = getTheme(themeId) || get().customThemes.find(t => t.id === themeId)
-          if (!theme) return ''
-
-          return cssManager.generateCSSString(theme)
+        /**
+         * Create theme from preset
+         */
+        createThemeFromPreset: (preset: ThemePreset, type: 'light' | 'dark' = 'light', customName?: string) => {
+          try {
+            const theme = createThemeFromPreset(preset, type, customName)
+            return get().createCustomTheme(theme)
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create theme from preset'
+            set({ error: errorMessage })
+            throw error
+          }
         },
 
-        initializeTheme: () => {
-          const state = get()
-          const themeToApply = state.tenantTheme || getTheme(state.currentTheme)
+        // =======================================================================
+        // SYSTEM INTEGRATION
+        // =======================================================================
+
+        /**
+         * Update system theme preference
+         */
+        updateSystemThemePreference: (preference: 'light' | 'dark') => {
+          set({ systemThemePreference: preference })
           
-          if (themeToApply) {
-            cssManager.applyTheme(themeToApply)
-            
-            if (state.enableCustomColors) {
-              cssManager.applyCustomColors(state.customColors)
-            }
+          // If current theme is system, reapply it
+          if (get().currentTheme === 'system') {
+            get().setTheme('system')
           }
+        },
 
-          // Setup system theme listener
-          if (state.isSystemTheme) {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-            const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-              if (get().isSystemTheme) {
-                set((state) => {
-                  state.isDarkMode = e.matches
-                })
-                const systemTheme = getTheme(e.matches ? 'dark' : 'light')
-                if (systemTheme) {
-                  cssManager.applyTheme(systemTheme)
-                }
+        /**
+         * Set whether to respect system theme preference
+         */
+        setRespectSystemTheme: (respect: boolean) => {
+          set({ respectSystemTheme: respect })
+          
+          if (respect && get().currentTheme !== 'system') {
+            get().setTheme('system')
+          }
+        },
+
+        // =======================================================================
+        // THEME CREATOR UI
+        // =======================================================================
+
+        /**
+         * Open theme creator
+         */
+        openThemeCreator: () => set({ isCreatorOpen: true }),
+
+        /**
+         * Close theme creator
+         */
+        closeThemeCreator: () => set({ isCreatorOpen: false }),
+
+        // =======================================================================
+        // CACHE MANAGEMENT
+        // =======================================================================
+
+        /**
+         * Clear theme cache
+         */
+        clearThemeCache: () => {
+          set({ themeCache: new Map() })
+          CSSVariableManager.clearCache()
+        },
+
+        /**
+         * Preload all themes
+         */
+        preloadThemes: async () => {
+          if (!get().preloadThemes) return
+          
+          try {
+            const themes = get().availableThemes
+            const cache = new Map()
+            
+            for (const theme of themes) {
+              if (theme.type !== 'system') {
+                cache.set(theme.id, theme)
               }
             }
-            mediaQuery.addEventListener('change', handleSystemThemeChange)
+            
+            set({ themeCache: cache })
+          } catch (error) {
+            console.warn('Failed to preload themes:', error)
           }
+        },
 
-          // Inject utility classes
-          const utilityCSS = cssManager.generateUtilityClasses()
-          const styleElement = document.createElement('style')
-          styleElement.id = 'kairos-theme-utilities'
-          styleElement.textContent = utilityCSS
-          document.head.appendChild(styleElement)
+        // =======================================================================
+        // IMPORT/EXPORT
+        // =======================================================================
+
+        /**
+         * Export custom themes
+         */
+        exportThemes: () => {
+          const { customThemes } = get()
+          return JSON.stringify(customThemes, null, 2)
+        },
+
+        /**
+         * Import custom themes
+         */
+        importThemes: (themesJson: string) => {
+          try {
+            const importedThemes = JSON.parse(themesJson) as Theme[]
+            
+            if (!Array.isArray(importedThemes)) {
+              throw new Error('Invalid theme format')
+            }
+            
+            // Validate each theme
+            const validThemes: Theme[] = []
+            const errors: string[] = []
+            
+            for (const theme of importedThemes) {
+              const themeErrors = ThemeValidator.validateTheme(theme)
+              if (themeErrors.length === 0) {
+                validThemes.push({
+                  ...theme,
+                  id: `imported-${theme.id}-${Date.now()}`,
+                  isCustom: true
+                })
+              } else {
+                errors.push(`Theme '${theme.name}': ${themeErrors.join(', ')}`)
+              }
+            }
+            
+            if (validThemes.length === 0) {
+              throw new Error(`No valid themes found. Errors: ${errors.join('; ')}`)
+            }
+            
+            const { customThemes } = get()
+            const updatedCustomThemes = [...customThemes, ...validThemes]
+            
+            // Save to localStorage
+            saveCustomThemes(updatedCustomThemes)
+            
+            // Update store
+            set({
+              customThemes: updatedCustomThemes,
+              availableThemes: getAllThemes(),
+              error: null
+            })
+            
+            return {
+              imported: validThemes.length,
+              errors: errors.length > 0 ? errors : null
+            }
+            
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to import themes'
+            set({ error: errorMessage })
+            throw error
+          }
+        },
+
+        // =======================================================================
+        // ERROR HANDLING
+        // =======================================================================
+
+        /**
+         * Clear error state
+         */
+        clearError: () => set({ error: null }),
+
+        // =======================================================================
+        // UTILITIES
+        // =======================================================================
+
+        /**
+         * Refresh available themes
+         */
+        refreshThemes: () => {
+          set({
+            availableThemes: getAllThemes(),
+            customThemes: getCustomThemes()
+          })
         }
-      })),
+      }),
       {
-        name: 'kairos-theme-store',
+        name: THEME_STORAGE_KEY,
+        storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
           currentTheme: state.currentTheme,
-          customThemes: state.customThemes,
-          customColors: state.customColors,
+          systemThemePreference: state.systemThemePreference,
+          respectSystemTheme: state.respectSystemTheme,
           enableCustomColors: state.enableCustomColors,
-          enableTenantTheming: state.enableTenantTheming
-        })
+          transitionDuration: state.transitionDuration,
+          preloadThemes: state.preloadThemes,
+          persistCustomThemes: state.persistCustomThemes
+        }),
+        onRehydrateStorage: () => (state) => {
+          if (state) {
+            // Initialize theme on app load
+            state.setTheme(state.currentTheme)
+            
+            // Preload themes if enabled
+            if (state.preloadThemes) {
+              state.preloadThemes()
+            }
+          }
+        }
       }
     )
   )
 )
 
 // =============================================================================
-// THEME STORE SUBSCRIPTIONS
+// CONVENIENCE HOOKS
 // =============================================================================
 
-// Subscribe to theme changes to update document
-useThemeStore.subscribe(
-  (state) => state.currentTheme,
-  (currentTheme) => {
-    document.documentElement.setAttribute('data-theme', currentTheme)
-  }
-)
-
-// Subscribe to dark mode changes
-useThemeStore.subscribe(
-  (state) => state.isDarkMode,
-  (isDarkMode) => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }
-)
-
-// =============================================================================
-// UTILITY HOOKS
-// =============================================================================
-
+/**
+ * Hook to get current theme data
+ */
 export const useCurrentTheme = () => {
-  const currentTheme = useThemeStore(state => state.currentTheme)
-  const tenantTheme = useThemeStore(state => state.tenantTheme)
-  return tenantTheme || getTheme(currentTheme)
+  const currentThemeId = useThemeStore(state => state.currentTheme)
+  const availableThemes = useThemeStore(state => state.availableThemes)
+  
+  return availableThemes.find(theme => theme.id === currentThemeId) || availableThemes[0]
 }
 
+/**
+ * Hook to get theme actions only
+ */
 export const useThemeActions = () => {
   return useThemeStore(state => ({
     setTheme: state.setTheme,
-    toggleDarkMode: state.toggleDarkMode,
-    openThemeCreator: state.openThemeCreator,
-    setCustomColors: state.setCustomColors,
-    toggleCustomColors: state.toggleCustomColors
-  }))
-}
-
-export const useThemeCreator = () => {
-  return useThemeStore(state => ({
-    isOpen: state.isThemeCreatorOpen,
-    editingTheme: state.editingTheme,
     previewTheme: state.previewTheme,
-    open: state.openThemeCreator,
-    close: state.closeThemeCreator,
-    setEditing: state.setEditingTheme,
-    setPreview: state.setPreviewTheme,
-    save: state.saveEditingTheme,
-    reset: state.resetEditingTheme
+    toggleTheme: state.toggleTheme,
+    createCustomTheme: state.createCustomTheme,
+    updateCustomTheme: state.updateCustomTheme,
+    deleteCustomTheme: state.deleteCustomTheme,
+    createThemeFromPreset: state.createThemeFromPreset,
+    openThemeCreator: state.openThemeCreator,
+    closeThemeCreator: state.closeThemeCreator,
+    clearThemeCache: state.clearThemeCache,
+    exportThemes: state.exportThemes,
+    importThemes: state.importThemes,
+    clearError: state.clearError,
+    refreshThemes: state.refreshThemes
   }))
 }
 
-// Initialize theme store
-if (typeof window !== 'undefined') {
-  useThemeStore.getState().initializeTheme()
+/**
+ * Hook to get theme UI state
+ */
+export const useThemeUI = () => {
+  return useThemeStore(state => ({
+    isTransitioning: state.isTransitioning,
+    isCreatorOpen: state.isCreatorOpen,
+    previewTheme: state.previewTheme,
+    error: state.error
+  }))
 }
 
-export default useThemeStore
+/**
+ * Hook to get custom themes
+ */
+export const useCustomThemes = () => {
+  return useThemeStore(state => state.customThemes)
+}
+
+// =============================================================================
+// SYSTEM THEME DETECTION
+// =============================================================================
+
+/**
+ * Set up system theme detection
+ */
+export function setupSystemThemeDetection() {
+  if (typeof window === 'undefined') return
+  
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  
+  const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+    const preference = e.matches ? 'dark' : 'light'
+    useThemeStore.getState().updateSystemThemePreference(preference)
+  }
+  
+  // Set initial preference
+  const initialPreference = mediaQuery.matches ? 'dark' : 'light'
+  useThemeStore.getState().updateSystemThemePreference(initialPreference)
+  
+  // Listen for changes
+  mediaQuery.addEventListener('change', handleSystemThemeChange)
+  
+  return () => {
+    mediaQuery.removeEventListener('change', handleSystemThemeChange)
+  }
+}

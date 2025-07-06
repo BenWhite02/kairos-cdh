@@ -1,205 +1,25 @@
 // File: src/config/theme.config.ts
-// 🎨 Complete theme system configuration for Kairos Frontend
-// Supports multiple theme presets, custom themes, and tenant-specific theming
-// All styles kept in classes as per project requirements
+// 🎨 KAIROS Theme Configuration System
+// Centralized theme management with CSS-in-classes approach
+// Supports multiple themes, custom themes, and theme switching
 
-export interface ThemeColors {
-  // Primary palette
-  primary: {
-    50: string
-    100: string
-    200: string
-    300: string
-    400: string
-    500: string
-    600: string
-    700: string
-    800: string
-    900: string
-    950: string
-  }
-  
-  // Secondary palette
-  secondary: {
-    50: string
-    100: string
-    200: string
-    300: string
-    400: string
-    500: string
-    600: string
-    700: string
-    800: string
-    900: string
-    950: string
-  }
-  
-  // Accent palette
-  accent: {
-    50: string
-    100: string
-    200: string
-    300: string
-    400: string
-    500: string
-    600: string
-    700: string
-    800: string
-    900: string
-    950: string
-  }
-  
-  // Semantic colors
-  success: {
-    50: string
-    500: string
-    700: string
-  }
-  
-  warning: {
-    50: string
-    500: string
-    700: string
-  }
-  
-  error: {
-    50: string
-    500: string
-    700: string
-  }
-  
-  info: {
-    50: string
-    500: string
-    700: string
-  }
-  
-  // Neutral palette
-  gray: {
-    50: string
-    100: string
-    200: string
-    300: string
-    400: string
-    500: string
-    600: string
-    700: string
-    800: string
-    900: string
-    950: string
-  }
-}
-
-export interface ThemeTypography {
-  fontFamily: {
-    sans: string[]
-    mono: string[]
-    serif: string[]
-  }
-  fontSize: {
-    xs: string
-    sm: string
-    base: string
-    lg: string
-    xl: string
-    '2xl': string
-    '3xl': string
-    '4xl': string
-    '5xl': string
-    '6xl': string
-  }
-  fontWeight: {
-    light: number
-    normal: number
-    medium: number
-    semibold: number
-    bold: number
-    extrabold: number
-  }
-  lineHeight: {
-    tight: number
-    normal: number
-    relaxed: number
-    loose: number
-  }
-}
-
-export interface ThemeSpacing {
-  borderRadius: {
-    none: string
-    sm: string
-    base: string
-    md: string
-    lg: string
-    xl: string
-    '2xl': string
-    '3xl': string
-    full: string
-  }
-  spacing: {
-    px: string
-    0: string
-    1: string
-    2: string
-    3: string
-    4: string
-    5: string
-    6: string
-    8: string
-    10: string
-    12: string
-    16: string
-    20: string
-    24: string
-    32: string
-    40: string
-    48: string
-    56: string
-    64: string
-  }
-  shadows: {
-    none: string
-    sm: string
-    base: string
-    md: string
-    lg: string
-    xl: string
-    '2xl': string
-    inner: string
-  }
-}
-
-export interface ThemeDefinition {
-  id: string
-  name: string
-  description: string
-  colors: ThemeColors
-  typography: ThemeTypography
-  spacing: ThemeSpacing
-  isDark: boolean
-  isCustom: boolean
-  createdAt?: string
-  updatedAt?: string
-  tenantId?: string
-}
-
-export interface ThemeConfig {
-  themes: Record<string, ThemeDefinition>
-  defaultTheme: string
-  enableCustomThemes: boolean
-  enableTenantThemes: boolean
-  themeStorageKey: string
-  cssVariablePrefix: string
-  transitionDuration: number
-  cacheTimeout: number
-}
+import { Theme, ThemeVariables, ColorPalette, ThemePreset } from '@/types/theme.types'
 
 // =============================================================================
-// DEFAULT THEME DEFINITIONS
+// THEME CONSTANTS
 // =============================================================================
 
-const defaultColors: ThemeColors = {
-  primary: {
+export const THEME_STORAGE_KEY = import.meta.env.VITE_THEME_STORAGE_KEY || 'kairos_selected_theme'
+export const CUSTOM_THEMES_STORAGE_KEY = import.meta.env.VITE_THEME_CUSTOM_STORAGE_KEY || 'kairos_custom_themes'
+export const THEME_TRANSITION_DURATION = parseInt(import.meta.env.VITE_THEME_TRANSITION_DURATION) || 200
+
+// =============================================================================
+// COLOR PALETTES
+// =============================================================================
+
+export const colorPalettes: Record<string, ColorPalette> = {
+  // Classic Blue Palette
+  blue: {
     50: '#eff6ff',
     100: '#dbeafe',
     200: '#bfdbfe',
@@ -212,7 +32,24 @@ const defaultColors: ThemeColors = {
     900: '#1e3a8a',
     950: '#172554'
   },
-  secondary: {
+
+  // Modern Purple Palette
+  purple: {
+    50: '#faf5ff',
+    100: '#f3e8ff',
+    200: '#e9d5ff',
+    300: '#d8b4fe',
+    400: '#c084fc',
+    500: '#a855f7',
+    600: '#9333ea',
+    700: '#7c3aed',
+    800: '#6b21a8',
+    900: '#581c87',
+    950: '#3b0764'
+  },
+
+  // Vibrant Green Palette
+  green: {
     50: '#f0fdf4',
     100: '#dcfce7',
     200: '#bbf7d0',
@@ -225,39 +62,23 @@ const defaultColors: ThemeColors = {
     900: '#14532d',
     950: '#052e16'
   },
-  accent: {
-    50: '#fefce8',
-    100: '#fef9c3',
-    200: '#fef08a',
-    300: '#fde047',
-    400: '#facc15',
-    500: '#eab308',
-    600: '#ca8a04',
-    700: '#a16207',
-    800: '#854d0e',
-    900: '#713f12',
-    950: '#422006'
+
+  // Warm Orange Palette
+  orange: {
+    50: '#fff7ed',
+    100: '#ffedd5',
+    200: '#fed7aa',
+    300: '#fdba74',
+    400: '#fb923c',
+    500: '#f97316',
+    600: '#ea580c',
+    700: '#c2410c',
+    800: '#9a3412',
+    900: '#7c2d12',
+    950: '#431407'
   },
-  success: {
-    50: '#f0fdf4',
-    500: '#22c55e',
-    700: '#15803d'
-  },
-  warning: {
-    50: '#fefce8',
-    500: '#eab308',
-    700: '#a16207'
-  },
-  error: {
-    50: '#fef2f2',
-    500: '#ef4444',
-    700: '#c53030'
-  },
-  info: {
-    50: '#eff6ff',
-    500: '#3b82f6',
-    700: '#1d4ed8'
-  },
+
+  // Professional Gray Palette
   gray: {
     50: '#f9fafb',
     100: '#f3f4f6',
@@ -270,272 +91,436 @@ const defaultColors: ThemeColors = {
     800: '#1f2937',
     900: '#111827',
     950: '#030712'
-  }
-}
+  },
 
-const defaultTypography: ThemeTypography = {
-  fontFamily: {
-    sans: ['Inter', 'system-ui', 'sans-serif'],
-    mono: ['JetBrains Mono', 'Monaco', 'Consolas', 'monospace'],
-    serif: ['Georgia', 'Times New Roman', 'serif']
-  },
-  fontSize: {
-    xs: '0.75rem',
-    sm: '0.875rem',
-    base: '1rem',
-    lg: '1.125rem',
-    xl: '1.25rem',
-    '2xl': '1.5rem',
-    '3xl': '1.875rem',
-    '4xl': '2.25rem',
-    '5xl': '3rem',
-    '6xl': '3.75rem'
-  },
-  fontWeight: {
-    light: 300,
-    normal: 400,
-    medium: 500,
-    semibold: 600,
-    bold: 700,
-    extrabold: 800
-  },
-  lineHeight: {
-    tight: 1.25,
-    normal: 1.5,
-    relaxed: 1.625,
-    loose: 2
-  }
-}
-
-const defaultSpacing: ThemeSpacing = {
-  borderRadius: {
-    none: '0',
-    sm: '0.125rem',
-    base: '0.25rem',
-    md: '0.375rem',
-    lg: '0.5rem',
-    xl: '0.75rem',
-    '2xl': '1rem',
-    '3xl': '1.5rem',
-    full: '9999px'
-  },
-  spacing: {
-    px: '1px',
-    0: '0',
-    1: '0.25rem',
-    2: '0.5rem',
-    3: '0.75rem',
-    4: '1rem',
-    5: '1.25rem',
-    6: '1.5rem',
-    8: '2rem',
-    10: '2.5rem',
-    12: '3rem',
-    16: '4rem',
-    20: '5rem',
-    24: '6rem',
-    32: '8rem',
-    40: '10rem',
-    48: '12rem',
-    56: '14rem',
-    64: '16rem'
-  },
-  shadows: {
-    none: 'none',
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    base: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-    '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-    inner: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)'
+  // Elegant Rose Palette
+  rose: {
+    50: '#fff1f2',
+    100: '#ffe4e6',
+    200: '#fecdd3',
+    300: '#fda4af',
+    400: '#fb7185',
+    500: '#f43f5e',
+    600: '#e11d48',
+    700: '#be123c',
+    800: '#9f1239',
+    900: '#881337',
+    950: '#4c0519'
   }
 }
 
 // =============================================================================
-// THEME DEFINITIONS
+// BUILT-IN THEMES
 // =============================================================================
 
-const lightTheme: ThemeDefinition = {
-  id: 'light',
-  name: 'Light',
-  description: 'Clean and bright theme for optimal readability',
-  colors: defaultColors,
-  typography: defaultTypography,
-  spacing: defaultSpacing,
-  isDark: false,
-  isCustom: false
-}
-
-const darkTheme: ThemeDefinition = {
-  id: 'dark',
-  name: 'Dark',
-  description: 'Dark theme for reduced eye strain',
-  colors: {
-    ...defaultColors,
-    gray: {
-      50: '#030712',
-      100: '#111827',
-      200: '#1f2937',
-      300: '#374151',
-      400: '#4b5563',
-      500: '#6b7280',
-      600: '#9ca3af',
-      700: '#d1d5db',
-      800: '#e5e7eb',
-      900: '#f3f4f6',
-      950: '#f9fafb'
+export const builtInThemes: Record<string, Theme> = {
+  // Light Theme - Clean and Professional
+  light: {
+    id: 'light',
+    name: 'Light',
+    description: 'Clean and professional light theme',
+    type: 'light',
+    isCustom: false,
+    isDefault: true,
+    variables: {
+      // Primary Colors (Blue)
+      'color-primary-50': colorPalettes.blue[50],
+      'color-primary-100': colorPalettes.blue[100],
+      'color-primary-200': colorPalettes.blue[200],
+      'color-primary-300': colorPalettes.blue[300],
+      'color-primary-400': colorPalettes.blue[400],
+      'color-primary-500': colorPalettes.blue[500],
+      'color-primary-600': colorPalettes.blue[600],
+      'color-primary-700': colorPalettes.blue[700],
+      'color-primary-800': colorPalettes.blue[800],
+      'color-primary-900': colorPalettes.blue[900],
+      
+      // Secondary Colors (Gray)
+      'color-secondary-50': colorPalettes.gray[50],
+      'color-secondary-100': colorPalettes.gray[100],
+      'color-secondary-200': colorPalettes.gray[200],
+      'color-secondary-300': colorPalettes.gray[300],
+      'color-secondary-400': colorPalettes.gray[400],
+      'color-secondary-500': colorPalettes.gray[500],
+      'color-secondary-600': colorPalettes.gray[600],
+      'color-secondary-700': colorPalettes.gray[700],
+      'color-secondary-800': colorPalettes.gray[800],
+      'color-secondary-900': colorPalettes.gray[900],
+      
+      // Accent Colors (Purple)
+      'color-accent-50': colorPalettes.purple[50],
+      'color-accent-100': colorPalettes.purple[100],
+      'color-accent-200': colorPalettes.purple[200],
+      'color-accent-300': colorPalettes.purple[300],
+      'color-accent-400': colorPalettes.purple[400],
+      'color-accent-500': colorPalettes.purple[500],
+      'color-accent-600': colorPalettes.purple[600],
+      'color-accent-700': colorPalettes.purple[700],
+      'color-accent-800': colorPalettes.purple[800],
+      'color-accent-900': colorPalettes.purple[900],
+      
+      // Neutral Gray Scale
+      'color-gray-50': colorPalettes.gray[50],
+      'color-gray-100': colorPalettes.gray[100],
+      'color-gray-200': colorPalettes.gray[200],
+      'color-gray-300': colorPalettes.gray[300],
+      'color-gray-400': colorPalettes.gray[400],
+      'color-gray-500': colorPalettes.gray[500],
+      'color-gray-600': colorPalettes.gray[600],
+      'color-gray-700': colorPalettes.gray[700],
+      'color-gray-800': colorPalettes.gray[800],
+      'color-gray-900': colorPalettes.gray[900],
+      
+      // Semantic Colors
+      'color-success': colorPalettes.green[500],
+      'color-warning': colorPalettes.orange[500],
+      'color-error': colorPalettes.rose[500],
+      'color-info': colorPalettes.blue[500],
+      
+      // Background Colors
+      'color-background': '#ffffff',
+      'color-surface': colorPalettes.gray[50],
+      'color-surface-elevated': '#ffffff',
+      
+      // Text Colors
+      'color-text-primary': colorPalettes.gray[900],
+      'color-text-secondary': colorPalettes.gray[600],
+      'color-text-tertiary': colorPalettes.gray[400],
+      'color-text-inverse': '#ffffff',
+      
+      // Border Colors
+      'color-border': colorPalettes.gray[200],
+      'color-border-subtle': colorPalettes.gray[100],
+      'color-border-strong': colorPalettes.gray[300],
+      
+      // Typography
+      'font-family-sans': '"Inter", ui-sans-serif, system-ui, sans-serif',
+      'font-family-mono': '"JetBrains Mono", ui-monospace, monospace',
+      'font-size-xs': '0.75rem',
+      'font-size-sm': '0.875rem',
+      'font-size-base': '1rem',
+      'font-size-lg': '1.125rem',
+      'font-size-xl': '1.25rem',
+      'font-size-2xl': '1.5rem',
+      'font-size-3xl': '1.875rem',
+      'font-size-4xl': '2.25rem',
+      'line-height-tight': '1.25',
+      'line-height-normal': '1.5',
+      'line-height-relaxed': '1.75',
+      
+      // Spacing
+      'spacing-xs': '0.25rem',
+      'spacing-sm': '0.5rem',
+      'spacing-md': '1rem',
+      'spacing-lg': '1.5rem',
+      'spacing-xl': '2rem',
+      'spacing-2xl': '3rem',
+      
+      // Border Radius
+      'border-radius-sm': '0.25rem',
+      'border-radius-md': '0.375rem',
+      'border-radius-lg': '0.5rem',
+      'border-radius-xl': '0.75rem',
+      'border-radius-2xl': '1rem',
+      'border-radius-full': '9999px',
+      
+      // Shadows
+      'shadow-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+      'shadow-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      'shadow-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+      'shadow-xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
     }
   },
-  typography: defaultTypography,
-  spacing: defaultSpacing,
-  isDark: true,
-  isCustom: false
-}
 
-const systemTheme: ThemeDefinition = {
-  id: 'system',
-  name: 'System',
-  description: 'Automatically match your system preference',
-  colors: defaultColors,
-  typography: defaultTypography,
-  spacing: defaultSpacing,
-  isDark: false,
-  isCustom: false
-}
-
-const oceanTheme: ThemeDefinition = {
-  id: 'ocean',
-  name: 'Ocean',
-  description: 'Deep blue theme inspired by the ocean',
-  colors: {
-    ...defaultColors,
-    primary: {
-      50: '#ecfeff',
-      100: '#cffafe',
-      200: '#a5f3fc',
-      300: '#67e8f9',
-      400: '#22d3ee',
-      500: '#06b6d4',
-      600: '#0891b2',
-      700: '#0e7490',
-      800: '#155e75',
-      900: '#164e63',
-      950: '#083344'
-    },
-    secondary: {
-      50: '#f0f9ff',
-      100: '#e0f2fe',
-      200: '#bae6fd',
-      300: '#7dd3fc',
-      400: '#38bdf8',
-      500: '#0ea5e9',
-      600: '#0284c7',
-      700: '#0369a1',
-      800: '#075985',
-      900: '#0c4a6e',
-      950: '#082f49'
+  // Dark Theme - Modern and Sleek
+  dark: {
+    id: 'dark',
+    name: 'Dark',
+    description: 'Modern and sleek dark theme',
+    type: 'dark',
+    isCustom: false,
+    isDefault: false,
+    variables: {
+      // Primary Colors (Blue - adjusted for dark mode)
+      'color-primary-50': colorPalettes.blue[950],
+      'color-primary-100': colorPalettes.blue[900],
+      'color-primary-200': colorPalettes.blue[800],
+      'color-primary-300': colorPalettes.blue[700],
+      'color-primary-400': colorPalettes.blue[600],
+      'color-primary-500': colorPalettes.blue[500],
+      'color-primary-600': colorPalettes.blue[400],
+      'color-primary-700': colorPalettes.blue[300],
+      'color-primary-800': colorPalettes.blue[200],
+      'color-primary-900': colorPalettes.blue[100],
+      
+      // Secondary Colors (Gray - dark variants)
+      'color-secondary-50': colorPalettes.gray[900],
+      'color-secondary-100': colorPalettes.gray[800],
+      'color-secondary-200': colorPalettes.gray[700],
+      'color-secondary-300': colorPalettes.gray[600],
+      'color-secondary-400': colorPalettes.gray[500],
+      'color-secondary-500': colorPalettes.gray[400],
+      'color-secondary-600': colorPalettes.gray[300],
+      'color-secondary-700': colorPalettes.gray[200],
+      'color-secondary-800': colorPalettes.gray[100],
+      'color-secondary-900': colorPalettes.gray[50],
+      
+      // Accent Colors (Purple - adjusted)
+      'color-accent-50': colorPalettes.purple[950],
+      'color-accent-100': colorPalettes.purple[900],
+      'color-accent-200': colorPalettes.purple[800],
+      'color-accent-300': colorPalettes.purple[700],
+      'color-accent-400': colorPalettes.purple[600],
+      'color-accent-500': colorPalettes.purple[500],
+      'color-accent-600': colorPalettes.purple[400],
+      'color-accent-700': colorPalettes.purple[300],
+      'color-accent-800': colorPalettes.purple[200],
+      'color-accent-900': colorPalettes.purple[100],
+      
+      // Neutral Gray Scale (dark)
+      'color-gray-50': '#0f172a',
+      'color-gray-100': '#1e293b',
+      'color-gray-200': '#334155',
+      'color-gray-300': '#475569',
+      'color-gray-400': '#64748b',
+      'color-gray-500': '#94a3b8',
+      'color-gray-600': '#cbd5e1',
+      'color-gray-700': '#e2e8f0',
+      'color-gray-800': '#f1f5f9',
+      'color-gray-900': '#f8fafc',
+      
+      // Semantic Colors (dark optimized)
+      'color-success': colorPalettes.green[400],
+      'color-warning': colorPalettes.orange[400],
+      'color-error': colorPalettes.rose[400],
+      'color-info': colorPalettes.blue[400],
+      
+      // Background Colors (dark)
+      'color-background': '#0f172a',
+      'color-surface': '#1e293b',
+      'color-surface-elevated': '#334155',
+      
+      // Text Colors (dark)
+      'color-text-primary': '#f8fafc',
+      'color-text-secondary': '#cbd5e1',
+      'color-text-tertiary': '#94a3b8',
+      'color-text-inverse': '#0f172a',
+      
+      // Border Colors (dark)
+      'color-border': '#475569',
+      'color-border-subtle': '#334155',
+      'color-border-strong': '#64748b',
+      
+      // Typography (same as light)
+      'font-family-sans': '"Inter", ui-sans-serif, system-ui, sans-serif',
+      'font-family-mono': '"JetBrains Mono", ui-monospace, monospace',
+      'font-size-xs': '0.75rem',
+      'font-size-sm': '0.875rem',
+      'font-size-base': '1rem',
+      'font-size-lg': '1.125rem',
+      'font-size-xl': '1.25rem',
+      'font-size-2xl': '1.5rem',
+      'font-size-3xl': '1.875rem',
+      'font-size-4xl': '2.25rem',
+      'line-height-tight': '1.25',
+      'line-height-normal': '1.5',
+      'line-height-relaxed': '1.75',
+      
+      // Spacing (same as light)
+      'spacing-xs': '0.25rem',
+      'spacing-sm': '0.5rem',
+      'spacing-md': '1rem',
+      'spacing-lg': '1.5rem',
+      'spacing-xl': '2rem',
+      'spacing-2xl': '3rem',
+      
+      // Border Radius (same as light)
+      'border-radius-sm': '0.25rem',
+      'border-radius-md': '0.375rem',
+      'border-radius-lg': '0.5rem',
+      'border-radius-xl': '0.75rem',
+      'border-radius-2xl': '1rem',
+      'border-radius-full': '9999px',
+      
+      // Shadows (dark optimized)
+      'shadow-sm': '0 1px 2px 0 rgb(0 0 0 / 0.25)',
+      'shadow-md': '0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.25)',
+      'shadow-lg': '0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.25)',
+      'shadow-xl': '0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.25)'
     }
   },
-  typography: defaultTypography,
-  spacing: defaultSpacing,
-  isDark: false,
-  isCustom: false
+
+  // System Theme - Follows OS preference
+  system: {
+    id: 'system',
+    name: 'System',
+    description: 'Follows your system preference',
+    type: 'system',
+    isCustom: false,
+    isDefault: false,
+    variables: {} // Will use light or dark variables based on system preference
+  }
 }
 
-const forestTheme: ThemeDefinition = {
-  id: 'forest',
-  name: 'Forest',
-  description: 'Natural green theme inspired by forests',
-  colors: {
-    ...defaultColors,
-    primary: {
-      50: '#f0fdf4',
-      100: '#dcfce7',
-      200: '#bbf7d0',
-      300: '#86efac',
-      400: '#4ade80',
-      500: '#22c55e',
-      600: '#16a34a',
-      700: '#15803d',
-      800: '#166534',
-      900: '#14532d',
-      950: '#052e16'
-    },
-    secondary: {
-      50: '#f7fee7',
-      100: '#ecfccb',
-      200: '#d9f99d',
-      300: '#bef264',
-      400: '#a3e635',
-      500: '#84cc16',
-      600: '#65a30d',
-      700: '#4d7c0f',
-      800: '#3f6212',
-      900: '#365314',
-      950: '#1a2e05'
-    }
+// =============================================================================
+// THEME PRESETS FOR QUICK CREATION
+// =============================================================================
+
+export const themePresets: ThemePreset[] = [
+  {
+    id: 'corporate-blue',
+    name: 'Corporate Blue',
+    description: 'Professional blue theme for corporate use',
+    primary: 'blue',
+    secondary: 'gray',
+    accent: 'purple'
   },
-  typography: defaultTypography,
-  spacing: defaultSpacing,
-  isDark: false,
-  isCustom: false
-}
-
-// =============================================================================
-// MAIN CONFIGURATION
-// =============================================================================
-
-export const themeConfig: ThemeConfig = {
-  themes: {
-    light: lightTheme,
-    dark: darkTheme,
-    system: systemTheme,
-    ocean: oceanTheme,
-    forest: forestTheme
+  {
+    id: 'nature-green',
+    name: 'Nature Green',
+    description: 'Fresh green theme inspired by nature',
+    primary: 'green',
+    secondary: 'gray',
+    accent: 'blue'
   },
-  defaultTheme: import.meta.env.VITE_DEFAULT_THEME || 'light',
-  enableCustomThemes: import.meta.env.VITE_ENABLE_CUSTOM_THEMES !== 'false',
-  enableTenantThemes: import.meta.env.VITE_ENABLE_TENANT_THEMES !== 'false',
-  themeStorageKey: 'kairos-theme',
-  cssVariablePrefix: '--kairos',
-  transitionDuration: 200,
-  cacheTimeout: parseInt(import.meta.env.VITE_THEME_CACHE_TTL || '3600000')
-}
+  {
+    id: 'sunset-orange',
+    name: 'Sunset Orange',
+    description: 'Warm orange theme for creative projects',
+    primary: 'orange',
+    secondary: 'gray',
+    accent: 'rose'
+  },
+  {
+    id: 'royal-purple',
+    name: 'Royal Purple',
+    description: 'Elegant purple theme for premium feel',
+    primary: 'purple',
+    secondary: 'gray',
+    accent: 'blue'
+  },
+  {
+    id: 'romantic-rose',
+    name: 'Romantic Rose',
+    description: 'Soft rose theme for elegant designs',
+    primary: 'rose',
+    secondary: 'gray',
+    accent: 'purple'
+  }
+]
 
 // =============================================================================
-// UTILITY FUNCTIONS
+// THEME UTILITY FUNCTIONS
 // =============================================================================
 
-export const getTheme = (themeId: string): ThemeDefinition | null => {
-  return themeConfig.themes[themeId] || null
+/**
+ * Get all available themes (built-in + custom)
+ */
+export function getAllThemes(): Theme[] {
+  const customThemes = getCustomThemes()
+  return [...Object.values(builtInThemes), ...customThemes]
 }
 
-export const getAllThemes = (): ThemeDefinition[] => {
-  return Object.values(themeConfig.themes)
-}
-
-export const getThemeIds = (): string[] => {
-  return Object.keys(themeConfig.themes)
-}
-
-export const isValidThemeId = (themeId: string): boolean => {
-  return themeId in themeConfig.themes
-}
-
-export const getDefaultTheme = (): ThemeDefinition => {
-  return themeConfig.themes[themeConfig.defaultTheme] || themeConfig.themes.light
-}
-
-export const isDarkTheme = (themeId: string): boolean => {
-  const theme = getTheme(themeId)
-  if (!theme) return false
+/**
+ * Get a specific theme by ID
+ */
+export function getTheme(themeId: string): Theme | undefined {
+  // Check built-in themes first
+  if (builtInThemes[themeId]) {
+    return builtInThemes[themeId]
+  }
   
-  if (themeId === 'system') {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-  
-  return theme.isDark
+  // Check custom themes
+  const customThemes = getCustomThemes()
+  return customThemes.find(theme => theme.id === themeId)
 }
 
-export default themeConfig
+/**
+ * Get custom themes from localStorage
+ */
+export function getCustomThemes(): Theme[] {
+  try {
+    const stored = localStorage.getItem(CUSTOM_THEMES_STORAGE_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.warn('Failed to load custom themes:', error)
+    return []
+  }
+}
+
+/**
+ * Save custom themes to localStorage
+ */
+export function saveCustomThemes(themes: Theme[]): void {
+  try {
+    localStorage.setItem(CUSTOM_THEMES_STORAGE_KEY, JSON.stringify(themes))
+  } catch (error) {
+    console.error('Failed to save custom themes:', error)
+  }
+}
+
+/**
+ * Create a new theme from a preset
+ */
+export function createThemeFromPreset(
+  preset: ThemePreset,
+  type: 'light' | 'dark' = 'light',
+  customName?: string
+): Theme {
+  const baseTheme = builtInThemes[type]
+  const primaryPalette = colorPalettes[preset.primary]
+  const secondaryPalette = colorPalettes[preset.secondary]
+  const accentPalette = colorPalettes[preset.accent]
+  
+  const newTheme: Theme = {
+    id: `${preset.id}-${type}-${Date.now()}`,
+    name: customName || `${preset.name} (${type === 'light' ? 'Light' : 'Dark'})`,
+    description: `Custom ${preset.description.toLowerCase()}`,
+    type,
+    isCustom: true,
+    isDefault: false,
+    variables: {
+      ...baseTheme.variables,
+      // Override with preset colors
+      ...Object.keys(primaryPalette).reduce((acc, key) => {
+        acc[`color-primary-${key}`] = primaryPalette[key as keyof ColorPalette]
+        return acc
+      }, {} as ThemeVariables),
+      ...Object.keys(secondaryPalette).reduce((acc, key) => {
+        acc[`color-secondary-${key}`] = secondaryPalette[key as keyof ColorPalette]
+        return acc
+      }, {} as ThemeVariables),
+      ...Object.keys(accentPalette).reduce((acc, key) => {
+        acc[`color-accent-${key}`] = accentPalette[key as keyof ColorPalette]
+        return acc
+      }, {} as ThemeVariables)
+    }
+  }
+  
+  return newTheme
+}
+
+/**
+ * Validate theme structure
+ */
+export function validateTheme(theme: Partial<Theme>): string[] {
+  const errors: string[] = []
+  
+  if (!theme.id) errors.push('Theme ID is required')
+  if (!theme.name) errors.push('Theme name is required')
+  if (!theme.type || !['light', 'dark', 'system'].includes(theme.type)) {
+    errors.push('Theme type must be light, dark, or system')
+  }
+  if (!theme.variables || typeof theme.variables !== 'object') {
+    errors.push('Theme variables are required')
+  }
+  
+  return errors
+}
+
+/**
+ * Get default theme ID
+ */
+export function getDefaultThemeId(): string {
+  return import.meta.env.VITE_DEFAULT_THEME || 'light'
+}
